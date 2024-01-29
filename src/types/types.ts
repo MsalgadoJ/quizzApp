@@ -39,6 +39,7 @@ export interface AppState {
   hasAnswered: boolean;
   points: number;
   message: string;
+  finalUrl: string;
 }
 
 export interface CategoryOption {

@@ -25,3 +25,37 @@ export const pointsTable: PointsTable = {
 export const difficultyOptions = ['Any Difficulty', 'Easy', 'Medium', 'Hard'];
 
 export const typeOptions = ['Any Type', 'Multiple Choice', 'True/False'];
+
+export const BASE_URL = 'https://opentdb.com/';
+
+export function getFinalUrl(
+  catSelected: string,
+  difSelected: string,
+  tpSelected: string,
+  numberOfQuestions: number,
+  categories: any,
+): string {
+  const category =
+    catSelected.indexOf('Any Category') === -1
+      ? `&category=${categories.find((category) => category.name === catSelected)?.id}`
+      : '';
+  console.log('category', category);
+
+  const difficulty =
+    difSelected === 'Any Difficulty'
+      ? ''
+      : `&difficulty=${difSelected.toLocaleLowerCase()}`;
+  console.log('difficulty', difficulty);
+
+  const type =
+    tpSelected === 'Any Type'
+      ? ''
+      : `&type=${tpSelected.indexOf('True') === -1 ? 'multiple' : 'boolean'}`;
+
+  console.log('type', type);
+
+  const finalUrl = `${BASE_URL}api.php?amount=${numberOfQuestions}${category}${difficulty}${type}`;
+  console.log('******', finalUrl);
+
+  return finalUrl;
+}
