@@ -12,3 +12,13 @@ html {
   padding: 0;
   font-family: 'JetBrains Mono', monospace;
 }
+
+progress::-webkit-progress-bar {
+  background-color: #c084fc; /* Color de fondo de la barra de progreso */
+  border-radius: 100px;
+}
+
+progress::-webkit-progress-value {
+  background-color: #3b0764; /* Color de la parte llena de la barra de progreso */
+  border-radius: 100px;
+}

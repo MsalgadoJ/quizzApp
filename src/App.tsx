@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from 'react';
 
-import { Home } from './screens/home';
+import { Home } from './screens/Home';
 import {
   Question,
   QuizzState,
@@ -8,8 +8,11 @@ import {
   Action,
   AppState,
 } from './types/types';
-import { createOptions, pointsTable } from './helpers/helper';
-import { decode } from 'he';
+import { pointsTable } from './helpers/helper';
+
+import Loader from './components/Loader';
+import Quizz from './screens/Quizz';
+import Finished from './screens/Finished';
 
 function App() {
   const initialState: AppState = {
@@ -68,7 +71,13 @@ function App() {
           message: isCorrect
             ? 'Correct!!! 🥳'
             : '❌ Better try with the next one 😕',
-          points: state.points + pointsTable[currentQuestion.difficulty],
+          points: isCorrect
+            ? state.points + pointsTable[currentQuestion.difficulty]
+            : state.points,
+        };
+      case QuizzActionType.RESTART:
+        return {
+          ...initialState,
         };
       default:
         throw new Error('Action unknown');
@@ -93,12 +102,6 @@ function App() {
     initialState,
   );
 
-  const maxPoints = questions.reduce(
-    (maxPoints: number, question: Question) =>
-      maxPoints + pointsTable[question.difficulty],
-    0,
-  );
-
   useEffect(() => {
     async function fetchQuestions() {
       try {
@@ -120,80 +123,40 @@ function App() {
   }, [quizzState, questions]);
 
   async function handleStart(getFinalUrl: string) {
-    console.log('desde APP', getFinalUrl);
     dispatch({ type: QuizzActionType.START, payload: getFinalUrl });
   }
 
-  const handleAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const targetElement = e.target as HTMLButtonElement;
-    dispatch({
-      type: QuizzActionType.NEW_ANSWER,
-      payload: targetElement.innerText || targetElement.value,
-    });
-  };
+  function handleRestart() {
+    dispatch({ type: QuizzActionType.RESTART });
+  }
 
-  const handleNext = () => {
-    dispatch({ type: QuizzActionType.NEXT_QUESTION });
-  };
+  const className = `${quizzState === QuizzState.LOADING || quizzState === QuizzState.FINISHED ? 'h-screen flex justify-center items-center' : ''}`;
 
   return (
-    <div className="bg-bg-mobile h-screen bg-cover">
+    <div className={className}>
       <>
         {quizzState === QuizzState.PENDING && (
           <Home handleStart={handleStart} />
         )}
-        {quizzState === QuizzState.LOADING && 'Retrieving....'}
+        {quizzState === QuizzState.LOADING && <Loader />}
         {quizzState === QuizzState.STARTED && (
-          <div>
-            <div>
-              <p>{message}</p>
-              <span>Points: {points}</span>
-              <p>
-                Question: {currentIndex + 1}/{questions.length}
-              </p>
-            </div>
-            <h1>{currentQuestion ? decode(currentQuestion.question) : ''}</h1>
-            <div>
-              {currentQuestion &&
-                createOptions(
-                  currentQuestion.incorrect_answers,
-                  currentQuestion.correct_answer,
-                  randomNumber,
-                )?.map((answer) => {
-                  return (
-                    <button
-                      disabled={hasAnswered}
-                      key={answer}
-                      onClick={(e) => handleAnswer(e)}
-                    >
-                      {decode(answer)}
-                    </button>
-                  );
-                })}
-            </div>
-            <div>
-              <button disabled={!hasAnswered} onClick={() => handleNext()}>
-                Next
-              </button>
-            </div>
-          </div>
+          <Quizz
+            message={message}
+            points={points}
+            currentIndex={currentIndex}
+            questions={questions}
+            currentQuestion={currentQuestion}
+            randomNumber={randomNumber}
+            hasAnswered={hasAnswered}
+            dispatch={dispatch}
+          />
         )}
         {quizzState === QuizzState.FINISHED && (
-          <div>
-            <p>Total points: {points}</p>
-            <p>{points < maxPoints / 3 ? 'What was that? 🤨' : null}</p>
-            <p>
-              {points >= maxPoints / 3 && points < (2 / 3) * maxPoints
-                ? 'You can do better 😅'
-                : null}
-            </p>
-            <p>
-              {points >= (2 / 3) * maxPoints && points < maxPoints
-                ? 'That was good 😄'
-                : null}
-            </p>
-            <p>{points === maxPoints ? 'You are a genius!! 🥳' : null}</p>
-          </div>
+          <Finished
+            points={points}
+            questions={questions}
+            handleRestart={handleRestart}
+          />
         )}
       </>
     </div>

@@ -23,6 +23,7 @@ export enum QuizzActionType {
   FETCHED_DATA = 'fetchedData',
   NEXT_QUESTION = 'nextQuestion',
   NEW_ANSWER = 'newAnswer',
+  RESTART = 'restart',
 }
 
 export interface Action {

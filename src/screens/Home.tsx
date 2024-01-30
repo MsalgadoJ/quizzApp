@@ -54,50 +54,61 @@ export function Home({ handleStart }) {
   }
 
   return (
-    <div className="grid grid-rows-[auto_auto_1fr_auto] w-full">
-      <picture className="w-20 mx-auto mt-9 mb-4">
-        <img src="quiz.png" alt="" />
-      </picture>
-      <h1 className="text-3xl font-bold text-center">Welcome to QuizzyMind</h1>
-
-      <div className="flex flex-col justify-center items-center w-5/6 m-auto">
-        <p className="text-center mb-4">
+    <div className="bg-bg-mobile bg-cover grid h-screen grid-rows-[auto_1fr_auto] w-full animate-home">
+      <div className="w-5/6 m-auto mt-10 flex flex-col items-center">
+        <picture className="w-1/2 sm:w-60">
+          <img src="quiz.png" alt="" />
+        </picture>
+        <h1 className="text-3xl font-bold text-center mt-5">
+          Welcome to QuizzyMind
+        </h1>
+        <p className="text-center mt-6 mb-10">
           Please, select preferred options to start the game 😎
         </p>
-        <div className="w-full overflow-scroll">
-          <div className="flex gap-2 mb-4">
-            <label htmlFor="numOfQuestions">Number of questions</label>
-            <input
-              type="number"
-              id="numOfQuestions"
-              value={numberOfQuestions}
-              onChange={handleNumberOfQuestions}
+      </div>
+
+      <div className="overflow-auto sm:max-w-1/2">
+        <div className="flex flex-col justify-center items-center w-5/6 m-auto sm:max-w-[500px]">
+          <div className="w-full ">
+            <div className="w-full flex items-center gap-2 mb-4">
+              <label htmlFor="numOfQuestions" className="min-w-48">
+                Number of questions
+              </label>
+              <div className="">
+                <input
+                  className="w-full rounded-lg border border-stone-200 px-4 py-1 text-sm"
+                  type="number"
+                  id="numOfQuestions"
+                  value={numberOfQuestions}
+                  onChange={handleNumberOfQuestions}
+                />
+              </div>
+            </div>
+            <Select
+              name="category"
+              labelText="Choose your preferred category:"
+              selectedValue={selectedCategory}
+              handleSelect={handleSelectCategory}
+              options={categories}
+            />
+            <Select
+              name="difficulty"
+              labelText="Choose your level of difficulty:"
+              selectedValue={selectedDifficulty}
+              handleSelect={handleSelectDifficulty}
+              options={difficultyOptions}
+            />
+            <Select
+              name="type"
+              labelText="Choose preferred type of questions:"
+              selectedValue={selectedType}
+              handleSelect={handleSelectType}
+              options={typeOptions}
             />
           </div>
-          <Select
-            name="category"
-            labelText="Choose your preferred category:"
-            selectedValue={selectedCategory}
-            handleSelect={handleSelectCategory}
-            options={categories}
-          />
-          <Select
-            name="difficulty"
-            labelText="Choose your level of difficulty:"
-            selectedValue={selectedDifficulty}
-            handleSelect={handleSelectDifficulty}
-            options={difficultyOptions}
-          />
-          <Select
-            name="type"
-            labelText="Choose preferred type of questions:"
-            selectedValue={selectedType}
-            handleSelect={handleSelectType}
-            options={typeOptions}
-          />
         </div>
       </div>
-      <div className="w-5/6 m-auto">
+      <div className="w-5/6 m-auto sm:max-w-[500px]">
         <button
           className="w-full mb-4 uppercase inline-block rounded-full bg-orange-50 border-2 border-zinc-900 font-semibold text-zinc-900 tracking-wide px-4 py-2.5"
           onClick={() =>
