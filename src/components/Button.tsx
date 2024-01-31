@@ -8,24 +8,19 @@ const Button = ({ hasAnswered, answer, handleAnswer, correctAnswer }) => {
   console.log('correct', correctAnswer);
   const isCorrect = hasAnswered
     ? answer === correctAnswer
-      ? 'bg-violet-900 border-orange-50 text-orange-50 animate-pulse'
-      : 'bg-red-300 border-stone-400 text-neutral-600'
+      ? 'bg-emerald-600 border-2 border-emerald-950 text-emerald-100 '
+      : 'bg-neutral-300 border-2 border-stone-900 text-neutral-600 opacity-65 '
+    : 'bg-orange-50 border-2 border-zinc-900';
+  const hover = !hasAnswered
+    ? 'hover:bg-violet-200 hover:text-violet-900 hover:-translate-y-px hover:border-orange-50 active:translate-y-px'
     : '';
-
-  const handleCorrect = (e) => {
-    return e.target.innerText === correctAnswer
-      ? console.log('yei')
-      : console.log('noooooo');
-  };
-
   return (
     <button
-      className={`w-full inline-block rounded-full bg-orange-50 border-2 border-zinc-900 font-semibold py-2 ${isCorrect}`}
+      className={`w-full inline-block rounded-full font-semibold transition-colors duration-40 ${hover} focus:outline-none focus:ring focus:ring-orange-100 py-2 ${isCorrect}`}
       disabled={hasAnswered}
       key={answer}
       onClick={(e) => {
         handleAnswer(e);
-        handleCorrect(e);
       }}
     >
       {decode(answer)}

@@ -9,6 +9,8 @@ import {
   BASE_URL,
 } from '../helpers/helper';
 
+import { Slide, Fade } from 'react-awesome-reveal';
+
 // export interface IHomeProps {}
 
 export function Home({ handleStart }) {
@@ -19,7 +21,7 @@ export function Home({ handleStart }) {
     difficultyOptions[0],
   );
   const [selectedType, setSelectedType] = useState<string>('Any Type');
-  const [numberOfQuestions, setNumberOfQuestions] = useState(10);
+  const [numberOfQuestions, setNumberOfQuestions] = useState(5);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -54,77 +56,85 @@ export function Home({ handleStart }) {
   }
 
   return (
-    <div className="bg-bg-mobile bg-cover grid h-screen grid-rows-[auto_1fr_auto] w-full animate-home">
+    <div className="grid h-screen grid-rows-[auto_1fr_auto] w-full animate-home">
       <div className="w-5/6 m-auto mt-10 flex flex-col items-center">
-        <picture className="w-1/2 sm:w-60">
-          <img src="quiz.png" alt="" />
+        <picture className="w-32 sm:w-36">
+          <Slide direction="down">
+            <img src="quiz-logo.png" alt="" />
+          </Slide>
         </picture>
-        <h1 className="text-3xl font-bold text-center mt-5">
-          Welcome to QuizzyMind
-        </h1>
-        <p className="text-center mt-6 mb-10">
-          Please, select preferred options to start the game 😎
+        <Slide direction="left">
+          <h1 className="text-2xl font-bold text-center mt-5 sm:text-3xl">
+            Welcome to <br /> QuizzyMind
+          </h1>
+        </Slide>
+        <p className="text-center mt-6 mb-5 animate-pulseOnce">
+          Select preferred options to start the game 😎
         </p>
       </div>
 
       <div className="overflow-auto sm:max-w-1/2">
-        <div className="flex flex-col justify-center items-center w-5/6 m-auto sm:max-w-[500px]">
+        <div className="flex flex-col justify-center items-center w-5/6 mb-4 m-auto sm:max-w-[500px]">
           <div className="w-full ">
-            <div className="w-full flex items-center gap-2 mb-4">
-              <label htmlFor="numOfQuestions" className="min-w-48">
-                Number of questions
-              </label>
-              <div className="">
-                <input
-                  className="w-full rounded-lg border border-stone-200 px-4 py-1 text-sm"
-                  type="number"
-                  id="numOfQuestions"
-                  value={numberOfQuestions}
-                  onChange={handleNumberOfQuestions}
-                />
+            <Fade>
+              <div className="w-full flex justify-between items-center gap-2 mb-4 mt-2">
+                <label htmlFor="numOfQuestions" className="min-w-48">
+                  Number of questions
+                </label>
+                <div className="">
+                  <input
+                    className="w-full rounded-lg border border-stone-200 px-4 py-1 text-sm focus:bg-amber-200 focus:outline-none focus:ring focus:ring-violet-900"
+                    type="number"
+                    id="numOfQuestions"
+                    value={numberOfQuestions}
+                    onChange={handleNumberOfQuestions}
+                  />
+                </div>
               </div>
-            </div>
-            <Select
-              name="category"
-              labelText="Choose your preferred category:"
-              selectedValue={selectedCategory}
-              handleSelect={handleSelectCategory}
-              options={categories}
-            />
-            <Select
-              name="difficulty"
-              labelText="Choose your level of difficulty:"
-              selectedValue={selectedDifficulty}
-              handleSelect={handleSelectDifficulty}
-              options={difficultyOptions}
-            />
-            <Select
-              name="type"
-              labelText="Choose preferred type of questions:"
-              selectedValue={selectedType}
-              handleSelect={handleSelectType}
-              options={typeOptions}
-            />
+              <Select
+                name="category"
+                labelText="Choose your preferred category:"
+                selectedValue={selectedCategory}
+                handleSelect={handleSelectCategory}
+                options={categories}
+              />
+              <Select
+                name="difficulty"
+                labelText="Choose your level of difficulty:"
+                selectedValue={selectedDifficulty}
+                handleSelect={handleSelectDifficulty}
+                options={difficultyOptions}
+              />
+              <Select
+                name="type"
+                labelText="Choose preferred type of questions:"
+                selectedValue={selectedType}
+                handleSelect={handleSelectType}
+                options={typeOptions}
+              />
+            </Fade>
           </div>
         </div>
       </div>
-      <div className="w-5/6 m-auto sm:max-w-[500px]">
-        <button
-          className="w-full mb-4 uppercase inline-block rounded-full bg-orange-50 border-2 border-zinc-900 font-semibold text-zinc-900 tracking-wide px-4 py-2.5"
-          onClick={() =>
-            handleStart(
-              getFinalUrl(
-                selectedCategory,
-                selectedDifficulty,
-                selectedType,
-                numberOfQuestions,
-                categories,
-              ),
-            )
-          }
-        >
-          get started
-        </button>
+      <div className="w-5/6 m-auto sm:max-w-[500px] mb-3">
+        <Fade delay={500}>
+          <button
+            className="w-full mb-4 uppercase inline-block rounded-full bg-orange-50 border-2 border-zinc-900 font-semibold text-zinc-900 tracking-wide transition-colors duration-40 hover:bg-amber-500  hover:border-orange-50 hover:-translate-y-px active:translate-y-px focus:bg-amber-500 focus:outline-none focus:ring focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed px-4 py-2.5 animate-float"
+            onClick={() =>
+              handleStart(
+                getFinalUrl(
+                  selectedCategory,
+                  selectedDifficulty,
+                  selectedType,
+                  numberOfQuestions,
+                  categories,
+                ),
+              )
+            }
+          >
+            get started
+          </button>
+        </Fade>
       </div>
     </div>
   );

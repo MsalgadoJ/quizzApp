@@ -13,6 +13,7 @@ import { pointsTable } from './helpers/helper';
 import Loader from './components/Loader';
 import Quizz from './screens/Quizz';
 import Finished from './screens/Finished';
+import { Fade } from 'react-awesome-reveal';
 
 function App() {
   const initialState: AppState = {
@@ -56,6 +57,10 @@ function App() {
           hasAnswered: false,
           message: 'Enter your answer 😄',
           randomNumber: Math.floor(Math.random() * 4),
+          quizzState:
+            state.currentIndex + 1 === state.questions?.length
+              ? QuizzState.FINISHED
+              : state.quizzState,
         };
       case QuizzActionType.NEW_ANSWER:
         const currentQuestion = state.currentQuestion as Question;
@@ -64,13 +69,7 @@ function App() {
         return {
           ...state,
           hasAnswered: true,
-          quizzState:
-            state.currentIndex + 1 === state.questions?.length
-              ? QuizzState.FINISHED
-              : state.quizzState,
-          message: isCorrect
-            ? 'Correct!!! 🥳'
-            : '❌ Better try with the next one 😕',
+          message: isCorrect ? '/confetti.png' : '/warning.png',
           points: isCorrect
             ? state.points + pointsTable[currentQuestion.difficulty]
             : state.points,
@@ -130,7 +129,25 @@ function App() {
     dispatch({ type: QuizzActionType.RESTART });
   }
 
-  const className = `${quizzState === QuizzState.LOADING || quizzState === QuizzState.FINISHED ? 'h-screen flex justify-center items-center' : ''}`;
+  function getClassString(quizzState: string) {
+    let base = 'h-screen ';
+    if (quizzState === QuizzState.LOADING) {
+      base +=
+        'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-50';
+    } else if (quizzState === QuizzState.FINISHED) {
+      base +=
+        'flex justify-center items-center bg-bg-final-sm bg-cover sm:bg-bg-final-lg lg:bg-bg-final-xl';
+    } else if (quizzState === QuizzState.PENDING) {
+      base += 'bg-bg-start-sm bg-cover sm:bg-bg-start-xl';
+    } else if (quizzState === QuizzState.STARTED) {
+      base +=
+        'bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl';
+    }
+    return base;
+  }
+
+  const className = getClassString(quizzState);
+  console.log(className);
 
   return (
     <div className={className}>
@@ -138,7 +155,11 @@ function App() {
         {quizzState === QuizzState.PENDING && (
           <Home handleStart={handleStart} />
         )}
-        {quizzState === QuizzState.LOADING && <Loader />}
+        {quizzState === QuizzState.LOADING && (
+          <Fade>
+            <Loader />
+          </Fade>
+        )}
         {quizzState === QuizzState.STARTED && (
           <Quizz
             message={message}

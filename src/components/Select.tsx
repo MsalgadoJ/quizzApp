@@ -26,7 +26,7 @@ const Select: React.FunctionComponent<ISelectProps> = ({
     <div className="flex flex-col mb-4 gap-2 w-full">
       <label htmlFor={name}>{labelText}</label>
       <select
-        className="rounded-lg border border-stone-200 px-4 py-1 text-s"
+        className="rounded-lg border border-stone-200 px-4 py-1 text-s focus:bg-amber-200 focus:outline-none focus:ring focus:ring-violet-900 focus:ring-offset-2"
         name={name}
         id={name}
         value={selectedValue}
