@@ -23,6 +23,7 @@ export enum QuizzActionType {
   FETCHED_DATA = 'fetchedData',
   NEXT_QUESTION = 'nextQuestion',
   NEW_ANSWER = 'newAnswer',
+  RESTART = 'restart',
 }
 
 export interface Action {
@@ -39,6 +40,7 @@ export interface AppState {
   hasAnswered: boolean;
   points: number;
   message: string;
+  finalUrl: string;
 }
 
 export interface CategoryOption {

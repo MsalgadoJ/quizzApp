@@ -1,3 +1,25 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+* {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #fff7ed; /* Color de fondo de la barra de progreso */
+  border-radius: 100px;
+  opacity: 90%;
+}
+
+progress::-webkit-progress-value {
+  background-color: #4c1d95; /* Color de la parte llena de la barra de progreso */
+  border-radius: 100px;
+}
