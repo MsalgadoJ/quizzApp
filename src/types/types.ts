@@ -24,6 +24,7 @@ export enum QuizzActionType {
   NEXT_QUESTION = 'nextQuestion',
   NEW_ANSWER = 'newAnswer',
   RESTART = 'restart',
+  COUNT_DOWN = 'countDown',
 }
 
 export interface Action {
@@ -41,6 +42,7 @@ export interface AppState {
   points: number;
   message: string;
   finalUrl: string;
+  secondsRemaining: number;
 }
 
 export interface CategoryOption {

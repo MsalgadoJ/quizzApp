@@ -1,4 +1,4 @@
-import { PointsTable } from '../types/types';
+import { PointsTable, QuizzState } from '../types/types';
 
 export function createOptions(
   wrongAnswers: string[],
@@ -27,6 +27,8 @@ export const difficultyOptions = ['Any Difficulty', 'Easy', 'Medium', 'Hard'];
 export const typeOptions = ['Any Type', 'Multiple Choice', 'True/False'];
 
 export const BASE_URL = 'https://opentdb.com/';
+
+export const SECS_PER_QUESTION = 30;
 
 export function getFinalUrl(
   catSelected: string,
@@ -58,4 +60,21 @@ export function getFinalUrl(
   console.log('******', finalUrl);
 
   return finalUrl;
+}
+
+export function getClassString(quizzState: string) {
+  let base = 'h-screen ';
+  if (quizzState === QuizzState.LOADING) {
+    base +=
+      'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-50';
+  } else if (quizzState === QuizzState.FINISHED) {
+    base +=
+      'flex justify-center items-center bg-bg-final-sm bg-cover sm:bg-bg-final-lg lg:bg-bg-final-xl';
+  } else if (quizzState === QuizzState.PENDING) {
+    base += 'bg-bg-start-sm bg-cover sm:bg-bg-start-xl';
+  } else if (quizzState === QuizzState.STARTED) {
+    base +=
+      'bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl';
+  }
+  return base;
 }

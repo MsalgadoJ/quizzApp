@@ -4,6 +4,7 @@ import { QuizzActionType } from '../types/types';
 import { Zoom, Fade } from 'react-awesome-reveal';
 
 import { decode } from 'he';
+import Timer from '../components/Timer';
 
 // export interface IQuizzProps {}
 
@@ -16,6 +17,7 @@ export default function Quizz({
   currentQuestion,
   randomNumber,
   hasAnswered,
+  secondsRemaining,
   dispatch,
 }) {
   const handleAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -90,6 +92,7 @@ export default function Quizz({
             })}
         </div>
         <div className="mt-8 flex justify-end">
+          <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} />
           <button
             className={`rounded-lg bg-amber-500 border-2 border-zinc-900 py-2 px-5 uppercase  ${hasAnswered ? 'animate-pulse transition-colors duration-40 hover:bg-orange-200 hover:-translate-y-px active:translate-y-px' : ''}`}
             disabled={!hasAnswered}

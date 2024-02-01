@@ -8,7 +8,11 @@ import {
   Action,
   AppState,
 } from './types/types';
-import { pointsTable } from './helpers/helper';
+import {
+  pointsTable,
+  getClassString,
+  SECS_PER_QUESTION,
+} from './helpers/helper';
 
 import Loader from './components/Loader';
 import Quizz from './screens/Quizz';
@@ -26,6 +30,7 @@ function App() {
     points: 0,
     message: 'Enter your answer 😄',
     finalUrl: '',
+    secondsRemaining: 0,
   };
 
   function reducer(state: AppState, action: Action) {
@@ -45,6 +50,7 @@ function App() {
           questions,
           currentQuestion: questions.length > 0 ? questions[0] : undefined,
           quizzState: QuizzState.STARTED,
+          secondsRemaining: questions.length * SECS_PER_QUESTION,
         };
       case QuizzActionType.NEXT_QUESTION:
         const nextIndex = state.currentIndex + 1;
@@ -74,6 +80,15 @@ function App() {
             ? state.points + pointsTable[currentQuestion.difficulty]
             : state.points,
         };
+      case QuizzActionType.COUNT_DOWN:
+        return {
+          ...state,
+          secondsRemaining: state.secondsRemaining - 1,
+          quizzState:
+            state.secondsRemaining === 0
+              ? QuizzState.FINISHED
+              : state.quizzState,
+        };
       case QuizzActionType.RESTART:
         return {
           ...initialState,
@@ -94,6 +109,7 @@ function App() {
       points,
       message,
       finalUrl,
+      secondsRemaining,
     },
     dispatch,
   ] = useReducer<(state: AppState, action: Action) => AppState>(
@@ -129,23 +145,6 @@ function App() {
     dispatch({ type: QuizzActionType.RESTART });
   }
 
-  function getClassString(quizzState: string) {
-    let base = 'h-screen ';
-    if (quizzState === QuizzState.LOADING) {
-      base +=
-        'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-50';
-    } else if (quizzState === QuizzState.FINISHED) {
-      base +=
-        'flex justify-center items-center bg-bg-final-sm bg-cover sm:bg-bg-final-lg lg:bg-bg-final-xl';
-    } else if (quizzState === QuizzState.PENDING) {
-      base += 'bg-bg-start-sm bg-cover sm:bg-bg-start-xl';
-    } else if (quizzState === QuizzState.STARTED) {
-      base +=
-        'bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl';
-    }
-    return base;
-  }
-
   const className = getClassString(quizzState);
   console.log(className);
 
@@ -169,6 +168,7 @@ function App() {
             currentQuestion={currentQuestion}
             randomNumber={randomNumber}
             hasAnswered={hasAnswered}
+            secondsRemaining={secondsRemaining}
             dispatch={dispatch}
           />
         )}
