@@ -31,6 +31,7 @@ function App() {
     message: 'Enter your answer 😄',
     finalUrl: '',
     secondsRemaining: 0,
+    circleDash: 283
   };
 
   function reducer(state: AppState, action: Action) {
@@ -51,6 +52,7 @@ function App() {
           currentQuestion: questions.length > 0 ? questions[0] : undefined,
           quizzState: QuizzState.STARTED,
           secondsRemaining: questions.length * SECS_PER_QUESTION,
+          
         };
       case QuizzActionType.NEXT_QUESTION:
         const nextIndex = state.currentIndex + 1;
@@ -84,6 +86,7 @@ function App() {
         return {
           ...state,
           secondsRemaining: state.secondsRemaining - 1,
+          circleDash: (state.secondsRemaining /( state.questions.length * SECS_PER_QUESTION)) * 283,
           quizzState:
             state.secondsRemaining === 0
               ? QuizzState.FINISHED
@@ -110,6 +113,7 @@ function App() {
       message,
       finalUrl,
       secondsRemaining,
+      circleDash
     },
     dispatch,
   ] = useReducer<(state: AppState, action: Action) => AppState>(
@@ -146,7 +150,7 @@ function App() {
   }
 
   const className = getClassString(quizzState);
-  console.log(className);
+  // console.log(className);
 
   return (
     <div className={className}>
@@ -155,9 +159,9 @@ function App() {
           <Home handleStart={handleStart} />
         )}
         {quizzState === QuizzState.LOADING && (
-          <Fade>
+
             <Loader />
-          </Fade>
+
         )}
         {quizzState === QuizzState.STARTED && (
           <Quizz
@@ -169,6 +173,7 @@ function App() {
             randomNumber={randomNumber}
             hasAnswered={hasAnswered}
             secondsRemaining={secondsRemaining}
+            circleDash={circleDash}
             dispatch={dispatch}
           />
         )}

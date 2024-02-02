@@ -66,7 +66,7 @@ export function getClassString(quizzState: string) {
   let base = 'h-screen ';
   if (quizzState === QuizzState.LOADING) {
     base +=
-      'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-50';
+      'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-90';
   } else if (quizzState === QuizzState.FINISHED) {
     base +=
       'flex justify-center items-center bg-bg-final-sm bg-cover sm:bg-bg-final-lg lg:bg-bg-final-xl';

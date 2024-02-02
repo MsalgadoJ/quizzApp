@@ -4,8 +4,8 @@ import { decode } from 'he';
 
 // const Button: React.FunctionComponent<ButtonProps> = (props) => {
 const Button = ({ hasAnswered, answer, handleAnswer, correctAnswer }) => {
-  console.log(answer);
-  console.log('correct', correctAnswer);
+  // console.log(answer);
+  // console.log('correct', correctAnswer);
   const isCorrect = hasAnswered
     ? answer === correctAnswer
       ? 'bg-emerald-600 border-2 border-emerald-950 text-emerald-100 '
@@ -21,6 +21,11 @@ const Button = ({ hasAnswered, answer, handleAnswer, correctAnswer }) => {
       key={answer}
       onClick={(e) => {
         handleAnswer(e);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleAnswer(e);
+        }
       }}
     >
       {decode(answer)}

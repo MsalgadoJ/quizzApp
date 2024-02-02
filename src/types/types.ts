@@ -43,6 +43,7 @@ export interface AppState {
   message: string;
   finalUrl: string;
   secondsRemaining: number;
+  circleDash: number;
 }
 
 export interface CategoryOption {

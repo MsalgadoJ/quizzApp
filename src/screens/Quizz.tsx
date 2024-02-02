@@ -18,6 +18,7 @@ export default function Quizz({
   randomNumber,
   hasAnswered,
   secondsRemaining,
+  circleDash,
   dispatch,
 }) {
   const handleAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -64,7 +65,9 @@ export default function Quizz({
               </Zoom>
             </picture>
           ) : (
+            <Fade>
             <p>{message}</p>
+            </Fade>
           )}
           <span
             className={`text-sm uppercase ease-out ${message.indexOf('confetti') !== -1 ? 'animate-score' : ''}`}
@@ -91,12 +94,17 @@ export default function Quizz({
               );
             })}
         </div>
-        <div className="mt-8 flex justify-end">
-          <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} />
+        <div className="mt-8 flex justify-between items-center">
+          <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} circleDash={circleDash} />
           <button
-            className={`rounded-lg bg-amber-500 border-2 border-zinc-900 py-2 px-5 uppercase  ${hasAnswered ? 'animate-pulse transition-colors duration-40 hover:bg-orange-200 hover:-translate-y-px active:translate-y-px' : ''}`}
+            className={`rounded-lg bg-amber-500 border-2 border-zinc-900 py-2 px-5 uppercase  ${hasAnswered ? 'animate-pulse transition-colors duration-40 hover:bg-orange-200 hover:-translate-y-px active:translate-y-px ' : 'shadow-lg'}`}
             disabled={!hasAnswered}
             onClick={() => handleNext()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleNext();
+              }
+            }}
           >
             next
           </button>

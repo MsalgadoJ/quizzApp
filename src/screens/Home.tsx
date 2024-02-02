@@ -9,7 +9,7 @@ import {
   BASE_URL,
 } from '../helpers/helper';
 
-import { Slide, Fade } from 'react-awesome-reveal';
+import { Slide, Fade, Bounce } from 'react-awesome-reveal';
 
 // export interface IHomeProps {}
 
@@ -22,6 +22,7 @@ export function Home({ handleStart }) {
   );
   const [selectedType, setSelectedType] = useState<string>('Any Type');
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);
+  const [formError, setFormError] = useState(false)
 
   useEffect(() => {
     async function fetchCategories() {
@@ -38,6 +39,28 @@ export function Home({ handleStart }) {
     }
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const categoryId = categories.find(categories => categories.name === selectedCategory)?.id
+    console.log('categoryId', categoryId)
+   setFormError(false)
+    async function fetchCategoryCount () {
+      const res = await fetch(`${BASE_URL}api_count.php?category=${categoryId}`);
+      return await res.json();
+    }
+
+    const fetchData = async () => {
+      if(categoryId && selectedCategory) {
+        const data = await fetchCategoryCount()
+        if(selectedDifficulty !== difficultyOptions[0]) {
+          numberOfQuestions > data.category_question_count[`total_${selectedDifficulty.toLocaleLowerCase()}_question_count`] && setFormError(true)
+        } else if(categoryId !== 0) {
+          numberOfQuestions >data.category_question_count.total_question_count && setFormError(true)
+        }
+      }
+    }
+    fetchData()
+  }, [selectedCategory, numberOfQuestions, selectedDifficulty])
 
   // handlers
   function handleSelectCategory(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -73,23 +96,28 @@ export function Home({ handleStart }) {
         </p>
       </div>
 
-      <div className="overflow-auto sm:max-w-1/2">
+      <div className="overflow-y-auto overflow-x-hidden sm:max-w-1/2">
         <div className="flex flex-col justify-center items-center w-5/6 mb-4 m-auto sm:max-w-[500px]">
           <div className="w-full ">
-            <Fade>
-              <div className="w-full flex justify-between items-center gap-2 mb-4 mt-2">
+            <Slide direction="right">
+              <div className="w-full mb-4 mt-2">
+                <div className='flex justify-between items-center'>
                 <label htmlFor="numOfQuestions" className="min-w-48">
                   Number of questions
                 </label>
-                <div className="">
+                <div className="flex flex-col gap-2">
                   <input
-                    className="w-full rounded-lg border border-stone-200 px-4 py-1 text-sm focus:bg-amber-200 focus:outline-none focus:ring focus:ring-violet-900"
+                    className="w-full rounded-lg border-2 border-violet-200 px-4 py-1 text-sm focus:bg-amber-200 focus:outline-none focus:ring focus:ring-violet-900 shadow-md"
                     type="number"
                     id="numOfQuestions"
                     value={numberOfQuestions}
                     onChange={handleNumberOfQuestions}
                   />
                 </div>
+                </div>
+                {formError && (
+                  <Bounce>
+                <p className='mt-2 text-sm text-red-600'>Please select fewer questions for this category</p></Bounce>                )}
               </div>
               <Select
                 name="category"
@@ -112,7 +140,7 @@ export function Home({ handleStart }) {
                 handleSelect={handleSelectType}
                 options={typeOptions}
               />
-            </Fade>
+            </Slide>
           </div>
         </div>
       </div>
@@ -131,6 +159,20 @@ export function Home({ handleStart }) {
                 ),
               )
             }
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleStart(
+                  getFinalUrl(
+                    selectedCategory,
+                    selectedDifficulty,
+                    selectedType,
+                    numberOfQuestions,
+                    categories,
+                  ),
+                );
+              }
+            }}
           >
             get started
           </button>
