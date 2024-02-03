@@ -13,6 +13,7 @@ export default {
         'bg-final-sm': "url('/f-bg-sm.png')",
         'bg-final-lg': "url('/f-bg-lg.png')",
         'bg-final-xl': "url('/f-bg-xl.png')",
+        'arrow': "url('/down-arrow.png')",
       },
       keyframes: {
         score: {

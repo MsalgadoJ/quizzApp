@@ -1,13 +1,25 @@
 import Button from '../components/Button';
 import { createOptions } from '../helpers/helper';
-import { QuizzActionType } from '../types/types';
+import { QuizzActionType, Question, Action } from '../types/types';
 import { Zoom, Fade } from 'react-awesome-reveal';
 
 import { decode } from 'he';
+import Timer from '../components/Timer';
+import { Dispatch } from 'react';
 
-// export interface IQuizzProps {}
+export interface IQuizzProps {
+  message: string,
+  points: number,
+  currentIndex: number,
+  questions: Question[],
+  currentQuestion?: Question,
+  randomNumber: number,
+  hasAnswered: boolean,
+  secondsRemaining: number,
+  circleDash: number,
+  dispatch: Dispatch<Action>
+}
 
-// export default function Quizz(props: IQuizzProps) {
 export default function Quizz({
   message,
   points,
@@ -16,8 +28,10 @@ export default function Quizz({
   currentQuestion,
   randomNumber,
   hasAnswered,
+  secondsRemaining,
+  circleDash,
   dispatch,
-}) {
+}: IQuizzProps) {
   const handleAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
     const targetElement = e.target as HTMLButtonElement;
     dispatch({
@@ -25,9 +39,6 @@ export default function Quizz({
       payload: targetElement.innerText || targetElement.value,
     });
   };
-
-  // fix sm bg
-  // check behavior with some asnwers that are not set as correct when they are
 
   const handleNext = () => {
     dispatch({ type: QuizzActionType.NEXT_QUESTION });
@@ -62,7 +73,9 @@ export default function Quizz({
               </Zoom>
             </picture>
           ) : (
+            <Fade>
             <p>{message}</p>
+            </Fade>
           )}
           <span
             className={`text-sm uppercase ease-out ${message.indexOf('confetti') !== -1 ? 'animate-score' : ''}`}
@@ -89,11 +102,17 @@ export default function Quizz({
               );
             })}
         </div>
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-between items-center">
+          <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} circleDash={circleDash} />
           <button
-            className={`rounded-lg bg-amber-500 border-2 border-zinc-900 py-2 px-5 uppercase  ${hasAnswered ? 'animate-pulse transition-colors duration-40 hover:bg-orange-200 hover:-translate-y-px active:translate-y-px' : ''}`}
+            className={`rounded-lg bg-amber-500 border-2 border-zinc-900 py-2 px-5 uppercase  ${hasAnswered ? 'animate-pulse transition-colors duration-40 hover:bg-orange-200 hover:-translate-y-px active:translate-y-px ' : 'shadow-lg'}`}
             disabled={!hasAnswered}
             onClick={() => handleNext()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleNext();
+              }
+            }}
           >
             next
           </button>

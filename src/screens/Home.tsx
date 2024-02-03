@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 
 import Select from '../components/Select';
-import { CategoryOption } from '../types/types';
+import { CategoryOption, InputType } from '../types/types';
 import {
   difficultyOptions,
   typeOptions,
@@ -9,11 +9,14 @@ import {
   BASE_URL,
 } from '../helpers/helper';
 
-import { Slide, Fade } from 'react-awesome-reveal';
+import { Slide, Fade, Bounce } from 'react-awesome-reveal';
 
-// export interface IHomeProps {}
+interface IHomeProps {
+  handleStart: (finalUrl: string) => void
+}
 
-export function Home({ handleStart }) {
+export function Home({ handleStart }: IHomeProps) {
+
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [selectedCategory, setSelectedCategory] =
     useState<string>('Any Category');
@@ -22,6 +25,7 @@ export function Home({ handleStart }) {
   );
   const [selectedType, setSelectedType] = useState<string>('Any Type');
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);
+  const [formError, setFormError] = useState(false)
 
   useEffect(() => {
     async function fetchCategories() {
@@ -39,21 +43,51 @@ export function Home({ handleStart }) {
     fetchCategories();
   }, []);
 
-  // handlers
-  function handleSelectCategory(e: React.ChangeEvent<HTMLSelectElement>) {
-    setSelectedCategory(e.target.value);
+  useEffect(() => {
+    setFormError(false)
+    const categoryId = categories.find(categories => categories.name === selectedCategory)?.id
+
+    async function fetchCategoryCount () {
+      const res = await fetch(`${BASE_URL}api_count.php?category=${categoryId}`);
+      return await res.json();
+    }
+
+    const fetchData = async () => {
+      if(Number.isNaN(numberOfQuestions) || numberOfQuestions === 0) {
+        setFormError(true)
+      }
+      if(categoryId && selectedCategory) {
+        const data = await fetchCategoryCount()
+        if(selectedDifficulty !== difficultyOptions[0]) {
+          numberOfQuestions > data.category_question_count[`total_${selectedDifficulty.toLocaleLowerCase()}_question_count`] && setFormError(true)
+        } else if(categoryId !== 0) {
+          numberOfQuestions >data.category_question_count.total_question_count && setFormError(true)
+        }
+      }
+    }
+    fetchData()
+  }, [selectedCategory, numberOfQuestions, selectedDifficulty])
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>, inputName: string) {
+    switch(true) {
+      case inputName === InputType.NUMBER:
+        return setNumberOfQuestions(parseFloat(e.target.value))
+
+      case inputName === InputType.CATEGORY:
+        return setSelectedCategory(e.target.value)
+
+      case inputName === InputType.DIFFICULTY:
+        return setSelectedDifficulty(e.target.value)
+
+      case inputName === InputType.TYPE:
+        return setSelectedType(e.target.value)
+
+      default:
+        throw new Error('type unknown')
+    }
   }
 
-  function handleSelectDifficulty(e: React.ChangeEvent<HTMLSelectElement>) {
-    setSelectedDifficulty(e.target.value);
-  }
-  function handleSelectType(e: React.ChangeEvent<HTMLSelectElement>) {
-    setSelectedType(e.target.value);
-  }
-
-  function handleNumberOfQuestions(e: React.ChangeEvent<HTMLInputElement>) {
-    setNumberOfQuestions(parseFloat(e.target.value));
-  }
+  const finalUrl = getFinalUrl(selectedCategory, selectedDifficulty, selectedType, numberOfQuestions, categories)
 
   return (
     <div className="grid h-screen grid-rows-[auto_1fr_auto] w-full animate-home">
@@ -73,46 +107,51 @@ export function Home({ handleStart }) {
         </p>
       </div>
 
-      <div className="overflow-auto sm:max-w-1/2">
+      <div className="overflow-y-auto overflow-x-hidden sm:max-w-1/2">
         <div className="flex flex-col justify-center items-center w-5/6 mb-4 m-auto sm:max-w-[500px]">
           <div className="w-full ">
-            <Fade>
-              <div className="w-full flex justify-between items-center gap-2 mb-4 mt-2">
+            <Slide direction="right">
+              <div className="w-full mb-4 mt-2">
+                <div className='flex justify-between items-center'>
                 <label htmlFor="numOfQuestions" className="min-w-48">
                   Number of questions
                 </label>
-                <div className="">
+                <div className="flex flex-col gap-2">
                   <input
-                    className="w-full rounded-lg border border-stone-200 px-4 py-1 text-sm focus:bg-amber-200 focus:outline-none focus:ring focus:ring-violet-900"
+                    className="w-full rounded-lg border-2 border-violet-200 px-4 py-1 text-sm focus:bg-amber-200 focus:outline-none focus:ring focus:ring-violet-900 shadow-md"
                     type="number"
                     id="numOfQuestions"
                     value={numberOfQuestions}
-                    onChange={handleNumberOfQuestions}
+                    onChange={(e) => handleChange(e, InputType.NUMBER)}
                   />
                 </div>
+                </div>
+                {formError && (
+                  <Bounce>
+                <p className='mt-2 text-sm text-red-600'>{numberOfQuestions > 0 ? 'Please select fewer questions for this category' : 'You must type a number'}</p></Bounce>                )}
               </div>
               <Select
                 name="category"
                 labelText="Choose your preferred category:"
                 selectedValue={selectedCategory}
-                handleSelect={handleSelectCategory}
+                handleSelect={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, InputType.CATEGORY)}
                 options={categories}
               />
               <Select
                 name="difficulty"
                 labelText="Choose your level of difficulty:"
                 selectedValue={selectedDifficulty}
-                handleSelect={handleSelectDifficulty}
+                handleSelect={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, InputType.DIFFICULTY)}
                 options={difficultyOptions}
               />
               <Select
                 name="type"
                 labelText="Choose preferred type of questions:"
                 selectedValue={selectedType}
-                handleSelect={handleSelectType}
+                handleSelect={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, InputType.TYPE)}
                 options={typeOptions}
               />
-            </Fade>
+            </Slide>
           </div>
         </div>
       </div>
@@ -121,16 +160,15 @@ export function Home({ handleStart }) {
           <button
             className="w-full mb-4 uppercase inline-block rounded-full bg-orange-50 border-2 border-zinc-900 font-semibold text-zinc-900 tracking-wide transition-colors duration-40 hover:bg-amber-500  hover:border-orange-50 hover:-translate-y-px active:translate-y-px focus:bg-amber-500 focus:outline-none focus:ring focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed px-4 py-2.5 animate-float"
             onClick={() =>
-              handleStart(
-                getFinalUrl(
-                  selectedCategory,
-                  selectedDifficulty,
-                  selectedType,
-                  numberOfQuestions,
-                  categories,
-                ),
-              )
+              handleStart(finalUrl)
             }
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleStart(finalUrl)
+              }
+            }}
+            disabled={formError}
           >
             get started
           </button>

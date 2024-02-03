@@ -1,19 +1,22 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from "react";
 
-import { Home } from './screens/Home';
+import { Home } from "./screens/Home";
 import {
   Question,
   QuizzState,
   QuizzActionType,
   Action,
   AppState,
-} from './types/types';
-import { pointsTable } from './helpers/helper';
+} from "./types/types";
+import {
+  pointsTable,
+  getClassString,
+  SECS_PER_QUESTION,
+} from "./helpers/helper";
 
-import Loader from './components/Loader';
-import Quizz from './screens/Quizz';
-import Finished from './screens/Finished';
-import { Fade } from 'react-awesome-reveal';
+import Loader from "./components/Loader";
+import Quizz from "./screens/Quizz";
+import Finished from "./screens/Finished";
 
 function App() {
   const initialState: AppState = {
@@ -24,8 +27,10 @@ function App() {
     currentIndex: 0,
     hasAnswered: false,
     points: 0,
-    message: 'Enter your answer 😄',
-    finalUrl: '',
+    message: "Enter your answer 😄",
+    finalUrl: "",
+    secondsRemaining: 0,
+    circleDash: 283,
   };
 
   function reducer(state: AppState, action: Action) {
@@ -45,6 +50,7 @@ function App() {
           questions,
           currentQuestion: questions.length > 0 ? questions[0] : undefined,
           quizzState: QuizzState.STARTED,
+          secondsRemaining: questions.length * SECS_PER_QUESTION,
         };
       case QuizzActionType.NEXT_QUESTION:
         const nextIndex = state.currentIndex + 1;
@@ -55,7 +61,7 @@ function App() {
             : undefined,
           currentIndex: nextIndex,
           hasAnswered: false,
-          message: 'Enter your answer 😄',
+          message: "Enter your answer 😄",
           randomNumber: Math.floor(Math.random() * 4),
           quizzState:
             state.currentIndex + 1 === state.questions?.length
@@ -69,17 +75,30 @@ function App() {
         return {
           ...state,
           hasAnswered: true,
-          message: isCorrect ? '/confetti.png' : '/warning.png',
+          message: isCorrect ? "/confetti.png" : "/warning.png",
           points: isCorrect
             ? state.points + pointsTable[currentQuestion.difficulty]
             : state.points,
+        };
+      case QuizzActionType.COUNT_DOWN:
+        return {
+          ...state,
+          secondsRemaining: state.secondsRemaining - 1,
+          circleDash:
+            (state.secondsRemaining /
+              (state.questions.length * SECS_PER_QUESTION)) *
+            283,
+          quizzState:
+            state.secondsRemaining === 0
+              ? QuizzState.FINISHED
+              : state.quizzState,
         };
       case QuizzActionType.RESTART:
         return {
           ...initialState,
         };
       default:
-        throw new Error('Action unknown');
+        throw new Error("Action unknown");
     }
   }
 
@@ -94,11 +113,13 @@ function App() {
       points,
       message,
       finalUrl,
+      secondsRemaining,
+      circleDash,
     },
     dispatch,
   ] = useReducer<(state: AppState, action: Action) => AppState>(
     reducer,
-    initialState,
+    initialState
   );
 
   useEffect(() => {
@@ -114,7 +135,7 @@ function App() {
 
     if (
       quizzState === QuizzState.LOADING &&
-      finalUrl !== '' &&
+      finalUrl !== "" &&
       questions.length === 0
     ) {
       fetchQuestions();
@@ -129,25 +150,7 @@ function App() {
     dispatch({ type: QuizzActionType.RESTART });
   }
 
-  function getClassString(quizzState: string) {
-    let base = 'h-screen ';
-    if (quizzState === QuizzState.LOADING) {
-      base +=
-        'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-50';
-    } else if (quizzState === QuizzState.FINISHED) {
-      base +=
-        'flex justify-center items-center bg-bg-final-sm bg-cover sm:bg-bg-final-lg lg:bg-bg-final-xl';
-    } else if (quizzState === QuizzState.PENDING) {
-      base += 'bg-bg-start-sm bg-cover sm:bg-bg-start-xl';
-    } else if (quizzState === QuizzState.STARTED) {
-      base +=
-        'bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl';
-    }
-    return base;
-  }
-
   const className = getClassString(quizzState);
-  console.log(className);
 
   return (
     <div className={className}>
@@ -155,11 +158,7 @@ function App() {
         {quizzState === QuizzState.PENDING && (
           <Home handleStart={handleStart} />
         )}
-        {quizzState === QuizzState.LOADING && (
-          <Fade>
-            <Loader />
-          </Fade>
-        )}
+        {quizzState === QuizzState.LOADING && <Loader />}
         {quizzState === QuizzState.STARTED && (
           <Quizz
             message={message}
@@ -169,6 +168,8 @@ function App() {
             currentQuestion={currentQuestion}
             randomNumber={randomNumber}
             hasAnswered={hasAnswered}
+            secondsRemaining={secondsRemaining}
+            circleDash={circleDash}
             dispatch={dispatch}
           />
         )}

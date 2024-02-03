@@ -1,4 +1,8 @@
-import { PointsTable } from '../types/types';
+import { Option, PointsTable, QuizzState } from '../types/types';
+
+export const BASE_URL = 'https://opentdb.com/';
+
+export const SECS_PER_QUESTION = 20;
 
 export function createOptions(
   wrongAnswers: string[],
@@ -26,8 +30,6 @@ export const difficultyOptions = ['Any Difficulty', 'Easy', 'Medium', 'Hard'];
 
 export const typeOptions = ['Any Type', 'Multiple Choice', 'True/False'];
 
-export const BASE_URL = 'https://opentdb.com/';
-
 export function getFinalUrl(
   catSelected: string,
   difSelected: string,
@@ -37,25 +39,36 @@ export function getFinalUrl(
 ): string {
   const category =
     catSelected.indexOf('Any Category') === -1
-      ? `&category=${categories.find((category) => category.name === catSelected)?.id}`
+      ? `&category=${categories.find((category: Option) => category.name === catSelected)?.id}`
       : '';
-  console.log('category', category);
 
   const difficulty =
     difSelected === 'Any Difficulty'
       ? ''
       : `&difficulty=${difSelected.toLocaleLowerCase()}`;
-  console.log('difficulty', difficulty);
 
   const type =
     tpSelected === 'Any Type'
       ? ''
       : `&type=${tpSelected.indexOf('True') === -1 ? 'multiple' : 'boolean'}`;
 
-  console.log('type', type);
-
   const finalUrl = `${BASE_URL}api.php?amount=${numberOfQuestions}${category}${difficulty}${type}`;
-  console.log('******', finalUrl);
-
   return finalUrl;
+}
+
+export function getClassString(quizzState: string) {
+  let base = 'h-screen ';
+  if (quizzState === QuizzState.LOADING) {
+    base +=
+      'flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-90';
+  } else if (quizzState === QuizzState.FINISHED) {
+    base +=
+      'flex justify-center items-center bg-bg-final-sm bg-cover sm:bg-bg-final-lg lg:bg-bg-final-xl';
+  } else if (quizzState === QuizzState.PENDING) {
+    base += 'bg-bg-start-sm bg-cover sm:bg-bg-start-xl';
+  } else if (quizzState === QuizzState.STARTED) {
+    base +=
+      'bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl';
+  }
+  return base;
 }
