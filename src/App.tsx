@@ -17,7 +17,6 @@ import {
 import Loader from './components/Loader';
 import Quizz from './screens/Quizz';
 import Finished from './screens/Finished';
-import { Fade } from 'react-awesome-reveal';
 
 function App() {
   const initialState: AppState = {
@@ -150,7 +149,6 @@ function App() {
   }
 
   const className = getClassString(quizzState);
-  // console.log(className);
 
   return (
     <div className={className}>

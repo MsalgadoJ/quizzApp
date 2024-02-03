@@ -1,14 +1,25 @@
 import Button from '../components/Button';
 import { createOptions } from '../helpers/helper';
-import { QuizzActionType } from '../types/types';
+import { QuizzActionType, Question, Action } from '../types/types';
 import { Zoom, Fade } from 'react-awesome-reveal';
 
 import { decode } from 'he';
 import Timer from '../components/Timer';
+import { Dispatch } from 'react';
 
-// export interface IQuizzProps {}
+export interface IQuizzProps {
+  message: string,
+  points: number,
+  currentIndex: number,
+  questions: Question[],
+  currentQuestion?: Question,
+  randomNumber: number,
+  hasAnswered: boolean,
+  secondsRemaining: number,
+  circleDash: number,
+  dispatch: Dispatch<Action>
+}
 
-// export default function Quizz(props: IQuizzProps) {
 export default function Quizz({
   message,
   points,
@@ -20,7 +31,7 @@ export default function Quizz({
   secondsRemaining,
   circleDash,
   dispatch,
-}) {
+}: IQuizzProps) {
   const handleAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
     const targetElement = e.target as HTMLButtonElement;
     dispatch({
@@ -28,9 +39,6 @@ export default function Quizz({
       payload: targetElement.innerText || targetElement.value,
     });
   };
-
-  // fix sm bg
-  // check behavior with some asnwers that are not set as correct when they are
 
   const handleNext = () => {
     dispatch({ type: QuizzActionType.NEXT_QUESTION });

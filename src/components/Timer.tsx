@@ -1,7 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { QuizzActionType } from '../types/types';
+import { Dispatch, useEffect, useRef } from 'react';
+import { Action, QuizzActionType } from '../types/types';
 
-function Timer({ dispatch, secondsRemaining, circleDash }) {
+export interface ITimerProps {
+  dispatch: Dispatch<Action>,
+  secondsRemaining: number,
+  circleDash: number
+}
+
+function Timer({ dispatch, secondsRemaining, circleDash }: ITimerProps) {
   const mins = Math.floor(secondsRemaining / 60);
   const seconds = secondsRemaining % 60;
   const timeLimit = useRef(secondsRemaining)
@@ -22,7 +28,6 @@ function Timer({ dispatch, secondsRemaining, circleDash }) {
       <path
         id="base-timer-path-remaining"
         strokeDasharray={`${Math.floor(circleDash)} 283`}
-        // strokeDasharray={`100 283`}
         className={`base-timer__path-remaining stroke-[7px] stroke-[linecap]-round transition-all duration-1000 ease-linear ${secondsRemaining > (timeLimit.current/2) ? 'stroke-purple-600' : (secondsRemaining > 5 ? 'stroke-orange-500' : 'stroke-red-600 animate-pulse')} rotate-90 origin-center 0`}
         d="
           M 50, 50

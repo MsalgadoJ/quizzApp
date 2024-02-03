@@ -1,12 +1,9 @@
-type Option = {
-  id: number;
-  name: string;
-};
+import { Option } from "../types/types";
 
 interface ISelectProps {
   name: string;
   labelText: string;
-  selectedValue: string | Option;
+  selectedValue: string ;
   handleSelect: any;
   options: Option[] | string[];
 }
@@ -19,8 +16,20 @@ const Select: React.FunctionComponent<ISelectProps> = ({
   handleSelect,
   options,
 }) => {
-  const getKey = (option: Option, i: number) => option.id ?? i + option;
-  const getText = (option) => option.name ?? option;
+
+  const getKey = (option: Option | string, i: number) => {
+    if (typeof option === 'string') {
+      return i + option
+    }
+    return option.id
+  };
+
+  const getText = (option: Option | string) => {
+    if (typeof option === 'string') {
+      return option
+    }
+    return option.name
+  };
 
   return (
     <div className="flex flex-col mb-4 gap-2 w-full">

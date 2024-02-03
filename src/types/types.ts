@@ -18,6 +18,13 @@ export enum QuizzState {
   FINISHED = 'finished',
 }
 
+export enum InputType {
+  CATEGORY = 'category',
+  DIFFICULTY = 'difficulty',
+  TYPE = 'type',
+  NUMBER = 'number',
+}
+
 export enum QuizzActionType {
   START = 'start',
   FETCHED_DATA = 'fetchedData',
@@ -50,3 +57,9 @@ export interface CategoryOption {
   id: number;
   name: string;
 }
+
+export type Option = {
+  id: number;
+  name: string;
+};
+

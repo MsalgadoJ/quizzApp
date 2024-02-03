@@ -1,4 +1,8 @@
-import { PointsTable, QuizzState } from '../types/types';
+import { Option, PointsTable, QuizzState } from '../types/types';
+
+export const BASE_URL = 'https://opentdb.com/';
+
+export const SECS_PER_QUESTION = 20;
 
 export function createOptions(
   wrongAnswers: string[],
@@ -26,10 +30,6 @@ export const difficultyOptions = ['Any Difficulty', 'Easy', 'Medium', 'Hard'];
 
 export const typeOptions = ['Any Type', 'Multiple Choice', 'True/False'];
 
-export const BASE_URL = 'https://opentdb.com/';
-
-export const SECS_PER_QUESTION = 30;
-
 export function getFinalUrl(
   catSelected: string,
   difSelected: string,
@@ -39,26 +39,20 @@ export function getFinalUrl(
 ): string {
   const category =
     catSelected.indexOf('Any Category') === -1
-      ? `&category=${categories.find((category) => category.name === catSelected)?.id}`
+      ? `&category=${categories.find((category: Option) => category.name === catSelected)?.id}`
       : '';
-  console.log('category', category);
 
   const difficulty =
     difSelected === 'Any Difficulty'
       ? ''
       : `&difficulty=${difSelected.toLocaleLowerCase()}`;
-  console.log('difficulty', difficulty);
 
   const type =
     tpSelected === 'Any Type'
       ? ''
       : `&type=${tpSelected.indexOf('True') === -1 ? 'multiple' : 'boolean'}`;
 
-  console.log('type', type);
-
   const finalUrl = `${BASE_URL}api.php?amount=${numberOfQuestions}${category}${difficulty}${type}`;
-  console.log('******', finalUrl);
-
   return finalUrl;
 }
 
