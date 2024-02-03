@@ -1,22 +1,22 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from "react";
 
-import { Home } from './screens/Home';
+import { Home } from "./screens/Home";
 import {
   Question,
   QuizzState,
   QuizzActionType,
   Action,
   AppState,
-} from './types/types';
+} from "./types/types";
 import {
   pointsTable,
   getClassString,
   SECS_PER_QUESTION,
-} from './helpers/helper';
+} from "./helpers/helper";
 
-import Loader from './components/Loader';
-import Quizz from './screens/Quizz';
-import Finished from './screens/Finished';
+import Loader from "./components/Loader";
+import Quizz from "./screens/Quizz";
+import Finished from "./screens/Finished";
 
 function App() {
   const initialState: AppState = {
@@ -27,10 +27,10 @@ function App() {
     currentIndex: 0,
     hasAnswered: false,
     points: 0,
-    message: 'Enter your answer 😄',
-    finalUrl: '',
+    message: "Enter your answer 😄",
+    finalUrl: "",
     secondsRemaining: 0,
-    circleDash: 283
+    circleDash: 283,
   };
 
   function reducer(state: AppState, action: Action) {
@@ -51,7 +51,6 @@ function App() {
           currentQuestion: questions.length > 0 ? questions[0] : undefined,
           quizzState: QuizzState.STARTED,
           secondsRemaining: questions.length * SECS_PER_QUESTION,
-          
         };
       case QuizzActionType.NEXT_QUESTION:
         const nextIndex = state.currentIndex + 1;
@@ -62,7 +61,7 @@ function App() {
             : undefined,
           currentIndex: nextIndex,
           hasAnswered: false,
-          message: 'Enter your answer 😄',
+          message: "Enter your answer 😄",
           randomNumber: Math.floor(Math.random() * 4),
           quizzState:
             state.currentIndex + 1 === state.questions?.length
@@ -76,7 +75,7 @@ function App() {
         return {
           ...state,
           hasAnswered: true,
-          message: isCorrect ? '/confetti.png' : '/warning.png',
+          message: isCorrect ? "/confetti.png" : "/warning.png",
           points: isCorrect
             ? state.points + pointsTable[currentQuestion.difficulty]
             : state.points,
@@ -85,7 +84,10 @@ function App() {
         return {
           ...state,
           secondsRemaining: state.secondsRemaining - 1,
-          circleDash: (state.secondsRemaining /( state.questions.length * SECS_PER_QUESTION)) * 283,
+          circleDash:
+            (state.secondsRemaining /
+              (state.questions.length * SECS_PER_QUESTION)) *
+            283,
           quizzState:
             state.secondsRemaining === 0
               ? QuizzState.FINISHED
@@ -96,7 +98,7 @@ function App() {
           ...initialState,
         };
       default:
-        throw new Error('Action unknown');
+        throw new Error("Action unknown");
     }
   }
 
@@ -112,12 +114,12 @@ function App() {
       message,
       finalUrl,
       secondsRemaining,
-      circleDash
+      circleDash,
     },
     dispatch,
   ] = useReducer<(state: AppState, action: Action) => AppState>(
     reducer,
-    initialState,
+    initialState
   );
 
   useEffect(() => {
@@ -133,7 +135,7 @@ function App() {
 
     if (
       quizzState === QuizzState.LOADING &&
-      finalUrl !== '' &&
+      finalUrl !== "" &&
       questions.length === 0
     ) {
       fetchQuestions();
@@ -156,11 +158,7 @@ function App() {
         {quizzState === QuizzState.PENDING && (
           <Home handleStart={handleStart} />
         )}
-        {quizzState === QuizzState.LOADING && (
-
-            <Loader />
-
-        )}
+        {quizzState === QuizzState.LOADING && <Loader />}
         {quizzState === QuizzState.STARTED && (
           <Quizz
             message={message}
