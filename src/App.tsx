@@ -22,12 +22,9 @@ function App() {
   const initialState: AppState = {
     quizzState: QuizzState.PENDING,
     questions: [],
-    randomNumber: 0,
     currentQuestion: undefined,
     currentIndex: 0,
-    hasAnswered: false,
     points: 0,
-    message: "Enter your answer 😄",
     finalUrl: "",
     secondsRemaining: 0,
     circleDash: 283,
@@ -52,6 +49,18 @@ function App() {
           quizzState: QuizzState.STARTED,
           secondsRemaining: questions.length * SECS_PER_QUESTION,
         };
+
+      case QuizzActionType.NEW_ANSWER:
+        const currentQuestion = state.currentQuestion as Question;
+        const answer = payload as boolean;
+
+        return {
+          ...state,
+          points: answer
+            ? state.points + pointsTable[currentQuestion.difficulty]
+            : state.points,
+        };
+
       case QuizzActionType.NEXT_QUESTION:
         const nextIndex = state.currentIndex + 1;
         return {
@@ -60,25 +69,10 @@ function App() {
             ? state.questions[nextIndex]
             : undefined,
           currentIndex: nextIndex,
-          hasAnswered: false,
-          message: "Enter your answer 😄",
-          randomNumber: Math.floor(Math.random() * 4),
           quizzState:
             state.currentIndex + 1 === state.questions?.length
               ? QuizzState.FINISHED
               : state.quizzState,
-        };
-      case QuizzActionType.NEW_ANSWER:
-        const currentQuestion = state.currentQuestion as Question;
-        const isCorrect = payload === currentQuestion.correct_answer;
-
-        return {
-          ...state,
-          hasAnswered: true,
-          message: isCorrect ? "/confetti.png" : "/warning.png",
-          points: isCorrect
-            ? state.points + pointsTable[currentQuestion.difficulty]
-            : state.points,
         };
       case QuizzActionType.COUNT_DOWN:
         return {
@@ -106,12 +100,9 @@ function App() {
     {
       quizzState,
       questions,
-      randomNumber,
       currentQuestion,
       currentIndex,
-      hasAnswered,
       points,
-      message,
       finalUrl,
       secondsRemaining,
       circleDash,
@@ -161,13 +152,10 @@ function App() {
         {quizzState === QuizzState.LOADING && <Loader />}
         {quizzState === QuizzState.STARTED && (
           <Quizz
-            message={message}
             points={points}
             currentIndex={currentIndex}
             questions={questions}
             currentQuestion={currentQuestion}
-            randomNumber={randomNumber}
-            hasAnswered={hasAnswered}
             secondsRemaining={secondsRemaining}
             circleDash={circleDash}
             dispatch={dispatch}
