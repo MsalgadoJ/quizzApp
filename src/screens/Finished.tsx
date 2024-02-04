@@ -56,5 +56,3 @@ export default function Finished({
     </div>
   );
 }
-
-// TO-DO: agregar otro color a la animación del botón

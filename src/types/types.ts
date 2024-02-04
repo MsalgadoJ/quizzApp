@@ -42,12 +42,9 @@ export interface Action {
 export interface AppState {
   quizzState: QuizzState;
   questions: Question[];
-  // randomNumber: number;
   currentQuestion?: Question;
   currentIndex: number;
-  // hasAnswered: boolean;
   points: number;
-  // message: string;
   finalUrl: string;
   secondsRemaining: number;
   circleDash: number;
