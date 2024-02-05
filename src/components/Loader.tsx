@@ -1,6 +1,3 @@
-// interface ILoaderProps {}
-
-// const Loader: React.FunctionComponent<ILoaderProps> = () => {
 const Loader = () => {
   return (
     <picture className="w-16">

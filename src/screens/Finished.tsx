@@ -1,56 +1,30 @@
-import { Question } from '../types/types';
-import { pointsTable } from '../helpers/helper';
-import { Flip, Zoom } from 'react-awesome-reveal';
+import { Action, Question, QuizzState } from "../types/types";
+import { pointsTable, getFinalMessage } from "../helpers/helper";
+import { Flip, Zoom } from "react-awesome-reveal";
+import { Dispatch } from "react";
+import ButtonStart from "../components/Button";
 
-// export interface IFinishedProps {}
+export interface IFinishedProps {
+  points: number;
+  questions: Question[];
+  quizzState: QuizzState;
+  dispatch: Dispatch<Action>;
+}
 
-// export default function Finished(props: IFinishedProps) {
-export default function Finished({ points, questions, handleRestart }) {
+export default function Finished({
+  points,
+  questions,
+  dispatch,
+  quizzState,
+}: IFinishedProps) {
   const maxPoints = questions.reduce(
     (maxPoints: number, question: Question) =>
       maxPoints + pointsTable[question.difficulty],
-    0,
+    0
   );
 
-  function getFinalMessage(maxPoints: number, points: number) {
-    switch (true) {
-      case points < maxPoints / 3:
-        return {
-          img: '/girl.png',
-          alt: 'What was that?',
-          message: 'What was that? 🤨',
-          right: '98',
-        };
-      case points >= maxPoints / 3 && points < (2 / 3) * maxPoints:
-        return {
-          img: '/okay.png',
-          alt: 'ok',
-          message: 'You can do better 😅',
-          right: '114',
-        };
-      case points >= (2 / 3) * maxPoints && points < maxPoints:
-        return {
-          img: '/good-job.png',
-          alt: 'good job badge',
-          message: 'That was great 😄',
-          right: '101',
-        };
-      case points === maxPoints:
-        return {
-          img: '/clap.png',
-          alt: 'clap',
-          message: 'You are a genius!! 🥳',
-          right: '98',
-        };
-      default:
-        throw new Error('Incorrect value');
-    }
-  }
-
   const finalMessage = getFinalMessage(maxPoints, points);
-  console.log(finalMessage);
 
-  console.log(getFinalMessage(maxPoints, points));
   return (
     <div className="max-w-[300px]">
       <Zoom>
@@ -75,16 +49,7 @@ export default function Finished({ points, questions, handleRestart }) {
           </picture>
         </div>
       </Zoom>
-      <div>
-        <button
-          className="w-full mb-4 uppercase inline-block rounded-full  bg-violet-900 border-2 border-orange-50 font-semibold text-orange-50 hover:-translate-y-px active:translate-y-px tracking-wide px-4 py-2.5 animate-pulse"
-          onClick={() => handleRestart()}
-        >
-          try again
-        </button>
-      </div>
+      <ButtonStart dispatch={dispatch} quizzState={quizzState} />
     </div>
   );
 }
-
-// TO-DO: agregar otro color a la animación del botón

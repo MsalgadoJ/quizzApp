@@ -12,42 +12,39 @@ export interface Question {
 }
 
 export enum QuizzState {
-  PENDING = 'pending',
-  LOADING = 'loading',
-  STARTED = 'started',
-  FINISHED = 'finished',
+  PENDING = "pending",
+  LOADING = "loading",
+  STARTED = "started",
+  FINISHED = "finished",
 }
 
 export enum InputType {
-  CATEGORY = 'category',
-  DIFFICULTY = 'difficulty',
-  TYPE = 'type',
-  NUMBER = 'number',
+  CATEGORY = "category",
+  DIFFICULTY = "difficulty",
+  TYPE = "type",
+  NUMBER = "number",
 }
 
 export enum QuizzActionType {
-  START = 'start',
-  FETCHED_DATA = 'fetchedData',
-  NEXT_QUESTION = 'nextQuestion',
-  NEW_ANSWER = 'newAnswer',
-  RESTART = 'restart',
-  COUNT_DOWN = 'countDown',
+  START = "start",
+  FETCHED_DATA = "fetchedData",
+  NEXT_QUESTION = "nextQuestion",
+  NEW_ANSWER = "newAnswer",
+  RESTART = "restart",
+  COUNT_DOWN = "countDown",
 }
 
 export interface Action {
   type: QuizzActionType;
-  payload?: Question[] | string;
+  payload?: Question[] | string | boolean;
 }
 
 export interface AppState {
   quizzState: QuizzState;
   questions: Question[];
-  randomNumber: number;
   currentQuestion?: Question;
   currentIndex: number;
-  hasAnswered: boolean;
   points: number;
-  message: string;
   finalUrl: string;
   secondsRemaining: number;
   circleDash: number;
@@ -62,4 +59,3 @@ export type Option = {
   id: number;
   name: string;
 };
-

@@ -1,36 +1,51 @@
-import { decode } from 'he';
+import { Fade } from "react-awesome-reveal";
+import { Action, QuizzActionType, QuizzState } from "../types/types";
+import { Dispatch } from "react";
 
-// interface ButtonProps {}
+interface PropsButton {
+  dispatch: Dispatch<Action>;
+  finalUrl?: string;
+  formError?: boolean;
+  quizzState: QuizzState;
+}
 
-// const Button: React.FunctionComponent<ButtonProps> = (props) => {
-const Button = ({ hasAnswered, answer, handleAnswer, correctAnswer }) => {
-  // console.log(answer);
-  // console.log('correct', correctAnswer);
-  const isCorrect = hasAnswered
-    ? answer === correctAnswer
-      ? 'bg-emerald-600 border-2 border-emerald-950 text-emerald-100 '
-      : 'bg-neutral-300 border-2 border-stone-900 text-neutral-600 opacity-65 '
-    : 'bg-orange-50 border-2 border-zinc-900';
-  const hover = !hasAnswered
-    ? 'hover:bg-violet-200 hover:text-violet-900 hover:-translate-y-px hover:border-orange-50 active:translate-y-px'
-    : '';
+function Button({ quizzState, dispatch, finalUrl, formError }: PropsButton) {
+  const base = `w-full mb-4 uppercase inline-block rounded-full font-semibold tracking-wide px-4 py-2.5 hover:-translate-y-px active:translate-y-px`;
   return (
-    <button
-      className={`w-full inline-block rounded-full font-semibold transition-colors duration-40 ${hover} focus:outline-none focus:ring focus:ring-orange-100 py-2 ${isCorrect}`}
-      disabled={hasAnswered}
-      key={answer}
-      onClick={(e) => {
-        handleAnswer(e);
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleAnswer(e);
-        }
-      }}
-    >
-      {decode(answer)}
-    </button>
+    <>
+      {quizzState === QuizzState.PENDING && (
+        <div className="w-5/6 m-auto sm:max-w-[500px] mb-3">
+          <Fade delay={500}>
+            <button
+              className={`${base} bg-orange-50 border-2 border-zinc-900 text-zinc-900 transition-colors duration-40 hover:bg-amber-500  hover:border-orange-50 focus:bg-amber-500 focus:outline-none focus:ring focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-not-allowed  animate-float`}
+              onClick={() =>
+                dispatch({ type: QuizzActionType.START, payload: finalUrl })
+              }
+              disabled={formError}
+            >
+              get started
+            </button>
+          </Fade>
+        </div>
+      )}
+      {quizzState === QuizzState.FINISHED && (
+        <div>
+          <button
+            className={`${base} bg-violet-900 border-2 border-orange-50 transition-transform text-orange-50 animate-pulse`}
+            onClick={() => dispatch({ type: QuizzActionType.RESTART })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                dispatch({ type: QuizzActionType.RESTART });
+              }
+            }}
+          >
+            try again
+          </button>
+        </div>
+      )}
+    </>
   );
-};
+}
 
 export default Button;

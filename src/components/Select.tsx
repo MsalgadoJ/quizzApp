@@ -3,12 +3,11 @@ import { Option } from "../types/types";
 interface ISelectProps {
   name: string;
   labelText: string;
-  selectedValue: string ;
+  selectedValue: string;
   handleSelect: any;
   options: Option[] | string[];
 }
 
-// const Select: React.FunctionComponent<ISelectProps> = (props) => {
 const Select: React.FunctionComponent<ISelectProps> = ({
   name,
   labelText,
@@ -16,19 +15,18 @@ const Select: React.FunctionComponent<ISelectProps> = ({
   handleSelect,
   options,
 }) => {
-
   const getKey = (option: Option | string, i: number) => {
-    if (typeof option === 'string') {
-      return i + option
+    if (typeof option === "string") {
+      return i + option;
     }
-    return option.id
+    return option.id;
   };
 
   const getText = (option: Option | string) => {
-    if (typeof option === 'string') {
-      return option
+    if (typeof option === "string") {
+      return option;
     }
-    return option.name
+    return option.name;
   };
 
   return (

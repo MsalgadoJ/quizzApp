@@ -22,12 +22,9 @@ function App() {
   const initialState: AppState = {
     quizzState: QuizzState.PENDING,
     questions: [],
-    randomNumber: 0,
     currentQuestion: undefined,
     currentIndex: 0,
-    hasAnswered: false,
     points: 0,
-    message: "Enter your answer 😄",
     finalUrl: "",
     secondsRemaining: 0,
     circleDash: 283,
@@ -52,46 +49,41 @@ function App() {
           quizzState: QuizzState.STARTED,
           secondsRemaining: questions.length * SECS_PER_QUESTION,
         };
-      case QuizzActionType.NEXT_QUESTION:
-        const nextIndex = state.currentIndex + 1;
-        return {
-          ...state,
-          currentQuestion: state.questions
-            ? state.questions[nextIndex]
-            : undefined,
-          currentIndex: nextIndex,
-          hasAnswered: false,
-          message: "Enter your answer 😄",
-          randomNumber: Math.floor(Math.random() * 4),
-          quizzState:
-            state.currentIndex + 1 === state.questions?.length
-              ? QuizzState.FINISHED
-              : state.quizzState,
-        };
+
       case QuizzActionType.NEW_ANSWER:
         const currentQuestion = state.currentQuestion as Question;
-        const isCorrect = payload === currentQuestion.correct_answer;
+        const answer = payload as boolean;
 
         return {
           ...state,
-          hasAnswered: true,
-          message: isCorrect ? "/confetti.png" : "/warning.png",
-          points: isCorrect
+          points: answer
             ? state.points + pointsTable[currentQuestion.difficulty]
             : state.points,
         };
-      case QuizzActionType.COUNT_DOWN:
+
+      case QuizzActionType.NEXT_QUESTION:
+        const nextIndex = state.currentIndex + 1;
+        const stateQuestions = state.questions;
         return {
           ...state,
-          secondsRemaining: state.secondsRemaining - 1,
-          circleDash:
-            (state.secondsRemaining /
-              (state.questions.length * SECS_PER_QUESTION)) *
-            283,
+          currentQuestion: stateQuestions
+            ? stateQuestions[nextIndex]
+            : undefined,
+          currentIndex: nextIndex,
           quizzState:
-            state.secondsRemaining === 0
+            state.currentIndex + 1 === stateQuestions?.length
               ? QuizzState.FINISHED
               : state.quizzState,
+        };
+      case QuizzActionType.COUNT_DOWN:
+        const timeLeft = state.secondsRemaining;
+        return {
+          ...state,
+          secondsRemaining: timeLeft - 1,
+          circleDash:
+            ((timeLeft - 1) / (state.questions.length * SECS_PER_QUESTION)) *
+            283,
+          quizzState: timeLeft === 0 ? QuizzState.FINISHED : state.quizzState,
         };
       case QuizzActionType.RESTART:
         return {
@@ -106,12 +98,9 @@ function App() {
     {
       quizzState,
       questions,
-      randomNumber,
       currentQuestion,
       currentIndex,
-      hasAnswered,
       points,
-      message,
       finalUrl,
       secondsRemaining,
       circleDash,
@@ -142,32 +131,21 @@ function App() {
     }
   }, [quizzState, questions]);
 
-  async function handleStart(getFinalUrl: string) {
-    dispatch({ type: QuizzActionType.START, payload: getFinalUrl });
-  }
-
-  function handleRestart() {
-    dispatch({ type: QuizzActionType.RESTART });
-  }
-
   const className = getClassString(quizzState);
 
   return (
     <div className={className}>
       <>
         {quizzState === QuizzState.PENDING && (
-          <Home handleStart={handleStart} />
+          <Home dispatch={dispatch} quizzState={quizzState} />
         )}
         {quizzState === QuizzState.LOADING && <Loader />}
         {quizzState === QuizzState.STARTED && (
           <Quizz
-            message={message}
             points={points}
             currentIndex={currentIndex}
             questions={questions}
             currentQuestion={currentQuestion}
-            randomNumber={randomNumber}
-            hasAnswered={hasAnswered}
             secondsRemaining={secondsRemaining}
             circleDash={circleDash}
             dispatch={dispatch}
@@ -177,7 +155,8 @@ function App() {
           <Finished
             points={points}
             questions={questions}
-            handleRestart={handleRestart}
+            dispatch={dispatch}
+            quizzState={quizzState}
           />
         )}
       </>
