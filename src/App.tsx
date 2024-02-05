@@ -63,29 +63,27 @@ function App() {
 
       case QuizzActionType.NEXT_QUESTION:
         const nextIndex = state.currentIndex + 1;
+        const stateQuestions = state.questions;
         return {
           ...state,
-          currentQuestion: state.questions
-            ? state.questions[nextIndex]
+          currentQuestion: stateQuestions
+            ? stateQuestions[nextIndex]
             : undefined,
           currentIndex: nextIndex,
           quizzState:
-            state.currentIndex + 1 === state.questions?.length
+            state.currentIndex + 1 === stateQuestions?.length
               ? QuizzState.FINISHED
               : state.quizzState,
         };
       case QuizzActionType.COUNT_DOWN:
+        const timeLeft = state.secondsRemaining;
         return {
           ...state,
-          secondsRemaining: state.secondsRemaining - 1,
+          secondsRemaining: timeLeft - 1,
           circleDash:
-            (state.secondsRemaining /
-              (state.questions.length * SECS_PER_QUESTION)) *
+            ((timeLeft - 1) / (state.questions.length * SECS_PER_QUESTION)) *
             283,
-          quizzState:
-            state.secondsRemaining === 0
-              ? QuizzState.FINISHED
-              : state.quizzState,
+          quizzState: timeLeft === 0 ? QuizzState.FINISHED : state.quizzState,
         };
       case QuizzActionType.RESTART:
         return {
@@ -133,21 +131,13 @@ function App() {
     }
   }, [quizzState, questions]);
 
-  async function handleStart(getFinalUrl: string) {
-    dispatch({ type: QuizzActionType.START, payload: getFinalUrl });
-  }
-
-  function handleRestart() {
-    dispatch({ type: QuizzActionType.RESTART });
-  }
-
   const className = getClassString(quizzState);
 
   return (
     <div className={className}>
       <>
         {quizzState === QuizzState.PENDING && (
-          <Home handleStart={handleStart} />
+          <Home dispatch={dispatch} quizzState={quizzState} />
         )}
         {quizzState === QuizzState.LOADING && <Loader />}
         {quizzState === QuizzState.STARTED && (
@@ -165,7 +155,8 @@ function App() {
           <Finished
             points={points}
             questions={questions}
-            handleRestart={handleRestart}
+            dispatch={dispatch}
+            quizzState={quizzState}
           />
         )}
       </>

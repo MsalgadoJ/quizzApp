@@ -1,6 +1,6 @@
 import { decode } from "he";
 import { createOptions } from "../helpers/helper";
-import { getAnswerStyles, getHover } from "../helpers/components/optionsHelper";
+import { getAnswerStyles, getHover } from "../helpers/helper";
 
 interface ButtonProps {
   hasAnswered: boolean;

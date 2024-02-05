@@ -5,6 +5,7 @@ import { Zoom, Fade } from "react-awesome-reveal";
 
 import { decode } from "he";
 import Timer from "../components/Timer";
+import NextButton from "../components/NextButton";
 
 export interface IQuizzProps {
   points: number;
@@ -31,11 +32,11 @@ export default function Quizz({
     Math.floor(Math.random() * 4)
   );
 
-  const handleAnswer = (
+  function handleAnswer(
     e:
       | React.MouseEvent<HTMLButtonElement>
       | React.KeyboardEvent<HTMLButtonElement>
-  ) => {
+  ) {
     setHasAnswered(true);
 
     const targetElement = e.target as HTMLButtonElement;
@@ -48,14 +49,14 @@ export default function Quizz({
       type: QuizzActionType.NEW_ANSWER,
       payload: isCorrect,
     });
-  };
+  }
 
-  const handleNext = () => {
+  function handleNext() {
     setHasAnswered(false);
     setMessage("Enter your answer 😄");
     setRandomNumber(Math.floor(Math.random() * 4));
     dispatch({ type: QuizzActionType.NEXT_QUESTION });
-  };
+  }
 
   return (
     <>
@@ -75,7 +76,11 @@ export default function Quizz({
             <h2>{currentQuestion ? decode(currentQuestion.question) : ""}</h2>
           </Fade>
           <picture className="absolute bottom-[-31px] right-[-26px] w-16">
-            <img src="/doubts.png" alt="doubt" className="animate-float" />
+            {!hasAnswered || message !== "/confetti.png" ? (
+              <img src="/doubts.png" alt="doubt" className="animate-float" />
+            ) : (
+              <img src="/correct.png" alt="correct" className="animate-float" />
+            )}
           </picture>
         </div>
         <div className="flex justify-between items-center mt-10 mb-7 text-center min-h-[50px] max-h-[50px]">
@@ -118,18 +123,7 @@ export default function Quizz({
             dispatch={dispatch}
             circleDash={circleDash}
           />
-          <button
-            className={`rounded-lg bg-amber-500 border-2 border-zinc-900 py-2 px-5 uppercase  ${hasAnswered ? "animate-pulse transition-colors duration-40 hover:bg-orange-200 hover:-translate-y-px active:translate-y-px " : "shadow-lg"}`}
-            disabled={!hasAnswered}
-            onClick={() => handleNext()}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                handleNext();
-              }
-            }}
-          >
-            next
-          </button>
+          <NextButton hasAnswered={hasAnswered} handleNext={handleNext} />
         </div>
       </div>
     </>

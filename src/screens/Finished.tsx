@@ -1,17 +1,21 @@
-import { Question } from "../types/types";
+import { Action, Question, QuizzState } from "../types/types";
 import { pointsTable, getFinalMessage } from "../helpers/helper";
 import { Flip, Zoom } from "react-awesome-reveal";
+import { Dispatch } from "react";
+import ButtonStart from "../components/Button";
 
 export interface IFinishedProps {
   points: number;
   questions: Question[];
-  handleRestart: () => void;
+  quizzState: QuizzState;
+  dispatch: Dispatch<Action>;
 }
 
 export default function Finished({
   points,
   questions,
-  handleRestart,
+  dispatch,
+  quizzState,
 }: IFinishedProps) {
   const maxPoints = questions.reduce(
     (maxPoints: number, question: Question) =>
@@ -45,14 +49,7 @@ export default function Finished({
           </picture>
         </div>
       </Zoom>
-      <div>
-        <button
-          className="w-full mb-4 uppercase inline-block rounded-full bg-violet-900 border-2 border-orange-50 font-semibold text-orange-50 hover:-translate-y-px active:translate-y-px tracking-wide px-4 py-2.5 animate-pulse"
-          onClick={() => handleRestart()}
-        >
-          try again
-        </button>
-      </div>
+      <ButtonStart dispatch={dispatch} quizzState={quizzState} />
     </div>
   );
 }
