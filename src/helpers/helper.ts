@@ -1,4 +1,5 @@
 import { Option, PointsTable, QuizzState } from "../types/types";
+import { translations } from "./translations";
 
 export const BASE_URL = "https://opentdb.com/";
 
@@ -26,7 +27,10 @@ export const pointsTable: PointsTable = {
   hard: 3,
 };
 
-export const difficultyOptions = ["Any Difficulty", "Easy", "Medium", "Hard"];
+export const difficultyOptions = {
+  en: ["Any Difficulty", "Easy", "Medium", "Hard"],
+  es: ["Cualquier dificultad", "Fácil", "Medio", "Difícil"],
+};
 
 export const typeOptions = ["Any Type", "Multiple Choice", "True/False"];
 
@@ -35,22 +39,24 @@ export function getFinalUrl(
   difSelected: string,
   tpSelected: string,
   numberOfQuestions: number,
-  categories: any
+  categories: any,
+  lang: string
 ): string {
   const category =
-    catSelected.indexOf("Any Category") === -1
+    catSelected.indexOf("Any Category") === -1 ||
+    catSelected.indexOf("Cualquier") === -1
       ? `&category=${categories.find((category: Option) => category.name === catSelected)?.id}`
       : "";
 
   const difficulty =
-    difSelected === "Any Difficulty"
+    difSelected === "Any Difficulty" || difSelected === "Cualquier dificultad"
       ? ""
-      : `&difficulty=${difSelected.toLocaleLowerCase()}`;
+      : `&difficulty=${lang === "en" ? difSelected.toLocaleLowerCase() : translations.en.home.difficultyOptions[translations.es.home.difficultyOptions.indexOf(difSelected)].toLowerCase()}`;
 
   const type =
-    tpSelected === "Any Type"
+    tpSelected === "Any Type" || tpSelected === "Cualquier tipo"
       ? ""
-      : `&type=${tpSelected.indexOf("True") === -1 ? "multiple" : "boolean"}`;
+      : `&type=${lang === "en" ? (tpSelected.indexOf("True") === -1 ? "multiple" : "boolean") : translations.en.home.TypeOptions[translations.es.home.TypeOptions.indexOf(tpSelected)].indexOf("True") === -1 ? "multiple" : "boolean"}`;
 
   const finalUrl = `${BASE_URL}api.php?amount=${numberOfQuestions}${category}${difficulty}${type}`;
   return finalUrl;

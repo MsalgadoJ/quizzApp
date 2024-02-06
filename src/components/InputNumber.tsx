@@ -2,6 +2,7 @@ import { Bounce } from "react-awesome-reveal";
 import { InputType } from "../types/types";
 
 type InputNumberProps = {
+  labelText: string;
   formError: boolean;
   numberOfQuestions: number;
   handleChange: (
@@ -11,6 +12,7 @@ type InputNumberProps = {
 };
 
 function InputNumber({
+  labelText,
   formError,
   numberOfQuestions,
   handleChange,
@@ -19,7 +21,7 @@ function InputNumber({
     <div className="w-full mb-4 mt-2">
       <div className="flex justify-between items-center">
         <label htmlFor="numOfQuestions" className="min-w-48">
-          Number of questions
+          {labelText}
         </label>
         <div className="flex flex-col gap-2">
           <input
