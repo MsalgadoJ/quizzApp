@@ -50,12 +50,16 @@ export interface AppState {
   circleDash: number;
 }
 
-export interface CategoryOption {
-  id: number;
-  name: string;
-}
-
 export type Option = {
   id: number;
   name: string;
 };
+
+export type HomeKeys =
+  | "inputLabel"
+  | "difficultyLabel"
+  | "difficultyOptions"
+  | "typeLabel"
+  | "typeOptions";
+
+export type Lang = "es" | "en";

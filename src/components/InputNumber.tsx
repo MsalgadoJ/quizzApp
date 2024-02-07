@@ -1,5 +1,6 @@
 import { Bounce } from "react-awesome-reveal";
-import { InputType } from "../types/types";
+import { InputType, Lang } from "../types/types";
+import { translations } from "../helpers/translations";
 
 type InputNumberProps = {
   labelText: string;
@@ -9,6 +10,7 @@ type InputNumberProps = {
     e: React.ChangeEvent<HTMLInputElement>,
     inputName: string
   ) => void;
+  lang: Lang;
 };
 
 function InputNumber({
@@ -16,6 +18,7 @@ function InputNumber({
   formError,
   numberOfQuestions,
   handleChange,
+  lang,
 }: InputNumberProps) {
   return (
     <div className="w-full mb-4 mt-2">
@@ -37,8 +40,8 @@ function InputNumber({
         <Bounce>
           <p className="mt-2 text-sm text-red-600">
             {numberOfQuestions > 0
-              ? "Please select fewer questions for this category"
-              : "You must type a number"}
+              ? translations[lang].home.formError1
+              : translations[lang].home.formError2}
           </p>
         </Bounce>
       )}

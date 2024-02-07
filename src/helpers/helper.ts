@@ -1,4 +1,10 @@
-import { Option, PointsTable, QuizzState } from "../types/types";
+import {
+  HomeKeys,
+  Lang,
+  Option,
+  PointsTable,
+  QuizzState,
+} from "../types/types";
 import { translations } from "./translations";
 
 export const BASE_URL = "https://opentdb.com/";
@@ -27,36 +33,46 @@ export const pointsTable: PointsTable = {
   hard: 3,
 };
 
-export const difficultyOptions = {
-  en: ["Any Difficulty", "Easy", "Medium", "Hard"],
-  es: ["Cualquier dificultad", "Fácil", "Medio", "Difícil"],
-};
+export function getIndex(value: string, prop: HomeKeys, lang: Lang) {
+  return translations[lang].home[prop].indexOf(value);
+}
 
-export const typeOptions = ["Any Type", "Multiple Choice", "True/False"];
+export function getTranslation(
+  lang: "es" | "en",
+  prop: HomeKeys,
+  index: number
+) {
+  return translations[lang].home[prop][index];
+}
+
+export function getCatId(array: Option[], value: string) {
+  return array.find((category: Option) => category.name === value)!.id;
+}
+
+export function findCat(array: Option[], value: number) {
+  return array.find((cat) => cat.id === value);
+}
 
 export function getFinalUrl(
-  catSelected: string,
-  difSelected: string,
-  tpSelected: string,
   numberOfQuestions: number,
-  categories: any,
-  lang: string
+  catSelected: Option,
+  difSelected: Option,
+  tpSelected: Option
 ): string {
-  const category =
-    catSelected.indexOf("Any Category") === -1 ||
-    catSelected.indexOf("Cualquier") === -1
-      ? `&category=${categories.find((category: Option) => category.name === catSelected)?.id}`
-      : "";
+  console.log(catSelected);
+  console.log(difSelected);
+  console.log(tpSelected);
+  const category = catSelected.id === 0 ? "" : `&category=${catSelected.id}`;
 
   const difficulty =
-    difSelected === "Any Difficulty" || difSelected === "Cualquier dificultad"
+    difSelected.id === 0
       ? ""
-      : `&difficulty=${lang === "en" ? difSelected.toLocaleLowerCase() : translations.en.home.difficultyOptions[translations.es.home.difficultyOptions.indexOf(difSelected)].toLowerCase()}`;
+      : `&difficulty=${translations.en.home.difficultyOptions[difSelected.id].toLowerCase()}`;
 
   const type =
-    tpSelected === "Any Type" || tpSelected === "Cualquier tipo"
+    tpSelected.id === 0
       ? ""
-      : `&type=${lang === "en" ? (tpSelected.indexOf("True") === -1 ? "multiple" : "boolean") : translations.en.home.TypeOptions[translations.es.home.TypeOptions.indexOf(tpSelected)].indexOf("True") === -1 ? "multiple" : "boolean"}`;
+      : `&type=${translations.en.home.typeOptions[tpSelected.id].indexOf("True") !== -1 ? "boolean" : "multiple"}`;
 
   const finalUrl = `${BASE_URL}api.php?amount=${numberOfQuestions}${category}${difficulty}${type}`;
   return finalUrl;

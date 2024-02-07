@@ -1,100 +1,50 @@
 import { useState, useEffect, ChangeEvent, Dispatch } from "react";
 
 import Select from "../components/Select";
-import { Action, CategoryOption, InputType, QuizzState } from "../types/types";
+import { Action, InputType, Lang, QuizzState, Option } from "../types/types";
 import {
-  difficultyOptions,
-  typeOptions,
-  getFinalUrl,
   BASE_URL,
+  findCat,
+  getCatId,
+  getIndex,
+  getTranslation,
 } from "../helpers/helper";
 
 import { Slide } from "react-awesome-reveal";
 import ButtonStart from "../components/Button";
 import InputNumber from "../components/InputNumber";
-import { translations } from "../helpers/translations";
+import { testDataEn, testDataEs, translations } from "../helpers/translations";
 
 interface IHomeProps {
   dispatch: Dispatch<Action>;
   quizzState: QuizzState;
 }
 
-const testDataEs = [
-  { id: 9, name: "Conocimientos generales" },
-  { id: 10, name: "Entretenimiento: libros" },
-  { id: 11, name: "Entretenimiento: cine" },
-  { id: 12, name: "Entretenimiento: Música" },
-  { id: 13, name: "Entretenimiento: musicales y teatros" },
-  { id: 14, name: "Entretenimiento: Televisión" },
-  { id: 15, name: "Entretenimiento: videojuegos" },
-  { id: 16, name: "Entretenimiento: juegos de mesa" },
-  { id: 17, name: "Ciencia y naturaleza" },
-  { id: 18, name: "Ciencia: Computadoras" },
-  { id: 19, name: "Ciencias: Matemáticas" },
-  { id: 20, name: "Mitología" },
-  { id: 21, name: "Deportes" },
-  { id: 22, name: "Geografía" },
-  { id: 23, name: "Historia" },
-  { id: 24, name: "Política" },
-  { id: 25, name: "Arte" },
-  { id: 26, name: "Famosos" },
-  { id: 27, name: "animales" },
-  { id: 28, name: "Vehículos" },
-  { id: 29, name: "Entretenimiento: cómics" },
-  { id: 30, name: "Ciencia: artilugios" },
-  { id: 31, name: "Entretenimiento: anime y manga japoneses" },
-  { id: 32, name: "Entretenimiento: dibujos animados y animaciones" },
-];
-
-const testDataEn = [
-  { id: 9, name: "General Knowledge" },
-  { id: 10, name: "Entertainment: Books" },
-  { id: 11, name: "Entertainment: Film" },
-  { id: 12, name: "Entertainment: Music" },
-  { id: 13, name: "Entertainment: Musicals & Theatres" },
-  { id: 14, name: "Entertainment: Television" },
-  { id: 15, name: "Entertainment: Video Games" },
-  { id: 16, name: "Entertainment: Board Games" },
-  { id: 17, name: "Science & Nature" },
-  { id: 18, name: "Science: Computers" },
-  { id: 19, name: "Science: Mathematics" },
-  { id: 20, name: "Mythology" },
-  { id: 21, name: "Sports" },
-  { id: 22, name: "Geography" },
-  { id: 23, name: "History" },
-  { id: 24, name: "Politics" },
-  { id: 25, name: "Art" },
-  { id: 26, name: "Celebrities" },
-  { id: 27, name: "Animals" },
-  { id: 28, name: "Vehicles" },
-  { id: 29, name: "Entertainment: Comics" },
-  { id: 30, name: "Science: Gadgets" },
-  { id: 31, name: "Entertainment: Japanese Anime & Manga" },
-  { id: 32, name: "Entertainment: Cartoon & Animations" },
-];
-
 export function Home({ dispatch, quizzState }: IHomeProps) {
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [EScategories, setESCategories] = useState<CategoryOption[]>([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>("Any Category");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>(
-    difficultyOptions.en[0]
-  );
-  const [selectedType, setSelectedType] = useState<string>("Any Type");
+  const [categories, setCategories] = useState<Option[]>([]);
+  const [EScategories, setESCategories] = useState<Option[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Option>({
+    id: 0,
+    name: "Any Category",
+  });
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Option>({
+    id: 0,
+    name: "Any Difficulty",
+  });
+  const [selectedType, setSelectedType] = useState<Option>({
+    id: 0,
+    name: "Any Type",
+  });
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);
   const [formError, setFormError] = useState(false);
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState<Lang>("en");
 
   useEffect(() => {
     setFormError(false);
-    const categoryId = categories.find(
-      (categories) => categories.name === selectedCategory
-    )?.id;
 
     async function fetchCategoryCount() {
       const res = await fetch(
-        `${BASE_URL}api_count.php?category=${categoryId}`
+        `${BASE_URL}api_count.php?category=${selectedCategory.id}`
       );
       return await res.json();
     }
@@ -103,20 +53,22 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
       if (Number.isNaN(numberOfQuestions) || numberOfQuestions === 0) {
         setFormError(true);
       }
-      if (categoryId && selectedCategory) {
+      if (selectedCategory.id !== 0) {
         const data = await fetchCategoryCount();
-        if (selectedDifficulty !== difficultyOptions[0]) {
+        console.log(data);
+        if (selectedDifficulty.id !== 0) {
           numberOfQuestions >
             data.category_question_count[
-              `total_${selectedDifficulty.toLocaleLowerCase()}_question_count`
+              `total_${translations.en.home.difficultyOptions[selectedDifficulty.id].toLocaleLowerCase()}_question_count`
             ] && setFormError(true);
-        } else if (categoryId !== 0) {
+        } else if (selectedCategory.id !== 0) {
           numberOfQuestions >
             data.category_question_count.total_question_count &&
             setFormError(true);
         }
       }
     };
+
     fetchData();
   }, [selectedCategory, numberOfQuestions, selectedDifficulty]);
 
@@ -133,6 +85,10 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
             { id: 0, name: "Cualquier categoría" },
             ...testDataEs,
           ]);
+          if (selectedCategory.id !== 0) {
+            const translateCategory = findCat(testDataEs, selectedCategory.id);
+            translateCategory && setSelectedCategory(translateCategory);
+          }
         }
       } catch (err) {
         console.error(err);
@@ -153,35 +109,69 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
         return setNumberOfQuestions(parseFloat(e.target.value));
 
       case inputName === InputType.CATEGORY:
-        console.log(e);
-        return setSelectedCategory(e.target.value);
+        const catId =
+          lang === "en"
+            ? getCatId(categories, e.target.value)
+            : getCatId(EScategories, e.target.value);
+        return setSelectedCategory({ id: catId, name: e.target.value });
 
       case inputName === InputType.DIFFICULTY:
-        return setSelectedDifficulty(e.target.value);
+        const indexD = getIndex(e.target.value, "difficultyOptions", lang);
+        return setSelectedDifficulty({ id: indexD, name: e.target.value });
 
       case inputName === InputType.TYPE:
-        return setSelectedType(e.target.value);
+        const indexT = getIndex(e.target.value, "typeOptions", lang);
+        return setSelectedType({ id: indexT, name: e.target.value });
 
       default:
         throw new Error("type unknown");
     }
   }
 
-  const finalUrl = getFinalUrl(
-    selectedCategory,
-    selectedDifficulty,
-    selectedType,
-    numberOfQuestions,
-    categories,
-    lang
-  );
-  console.log("finalUrl", finalUrl);
+  function handleLangChange(lang: Lang) {
+    if (
+      selectedCategory.id === 0 &&
+      selectedDifficulty.id === 0 &&
+      selectedType.id === 0
+    ) {
+      setLang(lang);
+    } else {
+      if (EScategories.length !== 0) {
+        const translateCategory =
+          lang === "es"
+            ? findCat(EScategories, selectedCategory.id)
+            : findCat(categories, selectedCategory.id);
+
+        translateCategory && setSelectedCategory(translateCategory);
+      }
+      const translateDifficulty = getTranslation(
+        lang,
+        "difficultyOptions",
+        selectedDifficulty.id
+      );
+      setSelectedDifficulty({
+        ...selectedDifficulty,
+        name: translateDifficulty,
+      });
+
+      const translateType = getTranslation(
+        lang,
+        "typeOptions",
+        selectedType.id
+      );
+      setSelectedType({
+        ...selectedType,
+        name: translateType,
+      });
+      setLang(lang);
+    }
+  }
 
   return (
     <div className="grid h-screen grid-rows-[auto_auto_1fr_auto] w-full animate-home">
       <div>
-        <button onClick={() => setLang("en")}>🇬🇧</button>
-        <button onClick={() => setLang("es")}>🇪🇸</button>
+        <button onClick={() => handleLangChange("en")}>🇬🇧</button>
+        <button onClick={() => handleLangChange("es")}>🇪🇸</button>
       </div>
       <div className="w-5/6 m-auto mt-10 flex flex-col items-center">
         <picture className="w-32 sm:w-36">
@@ -207,11 +197,12 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
                 formError={formError}
                 numberOfQuestions={numberOfQuestions}
                 handleChange={handleChange}
+                lang={lang}
               />
               <Select
                 name="category"
                 labelText="Choose your preferred category:"
-                selectedValue={selectedCategory}
+                selectedValue={selectedCategory.name}
                 handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
                   handleChange(e, InputType.CATEGORY)
                 }
@@ -220,7 +211,7 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
               <Select
                 name="difficulty"
                 labelText={`${translations[lang].home.difficultyLabel}:`}
-                selectedValue={selectedDifficulty}
+                selectedValue={selectedDifficulty.name}
                 handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
                   handleChange(e, InputType.DIFFICULTY)
                 }
@@ -229,11 +220,11 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
               <Select
                 name="type"
                 labelText={`${translations[lang].home.typeLabel}:`}
-                selectedValue={selectedType}
+                selectedValue={selectedType.name}
                 handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
                   handleChange(e, InputType.TYPE)
                 }
-                options={translations[lang].home.TypeOptions}
+                options={translations[lang].home.typeOptions}
               />
             </Slide>
           </div>
@@ -241,7 +232,10 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
       </div>
       <ButtonStart
         dispatch={dispatch}
-        finalUrl={finalUrl}
+        numberOfQuestions={numberOfQuestions}
+        selectedCategory={selectedCategory}
+        selectedDifficulty={selectedDifficulty}
+        selectedType={selectedType}
         formError={formError}
         quizzState={quizzState}
       />
