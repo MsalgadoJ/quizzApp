@@ -19,9 +19,15 @@ const initialState: AppState = {
   circleDash: 283,
 };
 
-type QuizzContextType = AppState | undefined;
+type QuizzContextType = {
+  state: AppState;
+  dispatch: React.Dispatch<Action>;
+};
 
-const QuizzContext = createContext<QuizzContextType>(undefined);
+const QuizzContext = createContext<QuizzContextType>({
+  state: initialState,
+  dispatch: () => {},
+});
 
 function reducer(state: AppState, action: Action) {
   const { type, payload } = action;
@@ -85,22 +91,11 @@ function reducer(state: AppState, action: Action) {
 }
 
 function QuizzProvider({ children }: { children: React.ReactNode }) {
-  const [
-    {
-      quizzState,
-      questions,
-      currentQuestion,
-      currentIndex,
-      points,
-      finalUrl,
-      secondsRemaining,
-      circleDash,
-    },
-    dispatch,
-  ] = useReducer<(state: AppState, action: Action) => AppState>(
-    reducer,
-    initialState
-  );
+  const [state, dispatch] = useReducer<
+    (state: AppState, action: Action) => AppState
+  >(reducer, initialState);
+
+  const { finalUrl, quizzState, questions } = state;
 
   useEffect(() => {
     async function fetchQuestions() {
@@ -123,18 +118,7 @@ function QuizzProvider({ children }: { children: React.ReactNode }) {
   }, [quizzState, questions]);
 
   return (
-    <QuizzContext.Provider
-      value={{
-        quizzState,
-        questions,
-        currentQuestion,
-        currentIndex,
-        points,
-        finalUrl,
-        secondsRemaining,
-        circleDash,
-      }}
-    >
+    <QuizzContext.Provider value={{ state, dispatch }}>
       {children}
     </QuizzContext.Provider>
   );

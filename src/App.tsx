@@ -1,5 +1,3 @@
-import { useEffect, useReducer } from "react";
-
 import { Home } from "./screens/Home";
 import { QuizzState } from "./types/types";
 import { getClassString } from "./helpers/helper";
@@ -11,6 +9,7 @@ import Finished from "./screens/Finished";
 import { useQuizz } from "./contexts/QuizzContext";
 
 function App() {
+  const { state, dispatch } = useQuizz();
   const {
     quizzState,
     points,
@@ -19,7 +18,7 @@ function App() {
     currentQuestion,
     secondsRemaining,
     circleDash,
-  } = useQuizz();
+  } = state;
 
   const className = getClassString(quizzState);
 
