@@ -54,7 +54,6 @@ function Button({
             onClick={() => dispatch({ type: QuizzActionType.RESTART })}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
                 dispatch({ type: QuizzActionType.RESTART });
               }
             }}

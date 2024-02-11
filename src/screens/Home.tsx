@@ -1,167 +1,34 @@
-import { useState, useEffect, ChangeEvent } from "react";
-
 import Select from "../components/Select";
-import { InputType, Option, Lang, QuizzActionType } from "../types/types";
-import {
-  BASE_URL,
-  findCat,
-  getCatId,
-  getIndex,
-  getTranslation,
-} from "../helpers/helper";
-
 import { Slide } from "react-awesome-reveal";
 import Button from "../components/Button";
 import InputNumber from "../components/InputNumber";
-import { testDataEn, testDataEs, translations } from "../helpers/translations";
+import { translations } from "../helpers/translations";
 import { useQuizz } from "../contexts/QuizzContext";
 import LangButton from "../components/LangButton";
+import { useCategory } from "../hooks/useCategory";
+import { useQuizzParams } from "../hooks/useQuizzParams";
+import { useFormError } from "../hooks/useFormError";
 
 export function Home() {
-  const { state, dispatch } = useQuizz();
-
+  const { state } = useQuizz();
   const { lang } = state;
-  const [categories, setCategories] = useState<Option[]>([]);
-  const [EScategories, setESCategories] = useState<Option[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Option>({
-    id: 0,
-    name: "Any Category",
-  });
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Option>({
-    id: 0,
-    name: "Any Difficulty",
-  });
-  const [selectedType, setSelectedType] = useState<Option>({
-    id: 0,
-    name: "Any Type",
-  });
-  const [numberOfQuestions, setNumberOfQuestions] = useState(5);
-  const [formError, setFormError] = useState(false);
 
-  useEffect(() => {
-    setFormError(false);
+  const { categories, EScategories } = useCategory(lang);
 
-    async function fetchCategoryCount() {
-      const res = await fetch(
-        `${BASE_URL}api_count.php?category=${selectedCategory.id}`
-      );
-      return await res.json();
-    }
+  const {
+    numberOfQuestions,
+    selectedCategory,
+    selectedDifficulty,
+    selectedType,
+    setQuizzParam,
+    handleLangChange,
+  } = useQuizzParams(categories, EScategories);
 
-    const fetchData = async () => {
-      if (Number.isNaN(numberOfQuestions) || numberOfQuestions === 0) {
-        setFormError(true);
-      }
-      if (selectedCategory.id !== 0) {
-        const data = await fetchCategoryCount();
-        console.log(data);
-        if (selectedDifficulty.id !== 0) {
-          numberOfQuestions >
-            data.category_question_count[
-              `total_${translations.en.home.difficultyOptions[selectedDifficulty.id].toLocaleLowerCase()}_question_count`
-            ] && setFormError(true);
-        } else if (selectedCategory.id !== 0) {
-          numberOfQuestions >
-            data.category_question_count.total_question_count &&
-            setFormError(true);
-        }
-      }
-    };
-
-    fetchData();
-  }, [selectedCategory, numberOfQuestions, selectedDifficulty]);
-
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        if (lang === "en") {
-          setCategories([{ id: 0, name: "Any Category" }, ...testDataEn]);
-        } else {
-          setESCategories([
-            { id: 0, name: "Cualquier categoría" },
-            ...testDataEs,
-          ]);
-          if (selectedCategory.id !== 0) {
-            const translateCategory = findCat(testDataEs, selectedCategory.id);
-            translateCategory && setSelectedCategory(translateCategory);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    if (categories.length === 0 || EScategories.length === 0) {
-      console.log("hago un fetch");
-      fetchCategories();
-    }
-  }, [lang]);
-
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-    inputName: string
-  ) {
-    switch (true) {
-      case inputName === InputType.NUMBER:
-        return setNumberOfQuestions(parseFloat(e.target.value));
-
-      case inputName === InputType.CATEGORY:
-        const catId =
-          lang === "en"
-            ? getCatId(categories, e.target.value)
-            : getCatId(EScategories, e.target.value);
-        return setSelectedCategory({ id: catId, name: e.target.value });
-
-      case inputName === InputType.DIFFICULTY:
-        const indexD = getIndex(e.target.value, "difficultyOptions", lang);
-        return setSelectedDifficulty({ id: indexD, name: e.target.value });
-
-      case inputName === InputType.TYPE:
-        const indexT = getIndex(e.target.value, "typeOptions", lang);
-        return setSelectedType({ id: indexT, name: e.target.value });
-
-      default:
-        throw new Error("type unknown");
-    }
-  }
-
-  function handleLangChange(lang: Lang) {
-    if (
-      selectedCategory.id === 0 &&
-      selectedDifficulty.id === 0 &&
-      selectedType.id === 0
-    ) {
-      dispatch({ type: QuizzActionType.CHANGE_LANG, payload: lang });
-    } else {
-      if (EScategories.length !== 0) {
-        const translateCategory =
-          lang === "es"
-            ? findCat(EScategories, selectedCategory.id)
-            : findCat(categories, selectedCategory.id);
-
-        translateCategory && setSelectedCategory(translateCategory);
-      }
-      const translateDifficulty = getTranslation(
-        lang,
-        "difficultyOptions",
-        selectedDifficulty.id
-      );
-      setSelectedDifficulty({
-        ...selectedDifficulty,
-        name: translateDifficulty,
-      });
-
-      const translateType = getTranslation(
-        lang,
-        "typeOptions",
-        selectedType.id
-      );
-      setSelectedType({
-        ...selectedType,
-        name: translateType,
-      });
-      dispatch({ type: QuizzActionType.CHANGE_LANG, payload: lang });
-    }
-  }
+  const { formError } = useFormError(
+    numberOfQuestions,
+    selectedCategory.id,
+    selectedDifficulty.id
+  );
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto] w-full animate-home">
@@ -203,34 +70,28 @@ export function Home() {
                 labelText={translations[lang].home.inputLabel}
                 formError={formError}
                 numberOfQuestions={numberOfQuestions}
-                handleChange={handleChange}
+                handleChange={setQuizzParam}
                 lang={lang}
               />
               <Select
                 name="category"
                 labelText={`${translations[lang].home.categoryLabel}:`}
                 selectedValue={selectedCategory.name}
-                handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleChange(e, InputType.CATEGORY)
-                }
+                handleSelect={setQuizzParam}
                 options={lang === "en" ? categories : EScategories}
               />
               <Select
                 name="difficulty"
                 labelText={`${translations[lang].home.difficultyLabel}:`}
                 selectedValue={selectedDifficulty.name}
-                handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleChange(e, InputType.DIFFICULTY)
-                }
+                handleSelect={setQuizzParam}
                 options={translations[lang].home.difficultyOptions}
               />
               <Select
                 name="type"
                 labelText={`${translations[lang].home.typeLabel}:`}
                 selectedValue={selectedType.name}
-                handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleChange(e, InputType.TYPE)
-                }
+                handleSelect={setQuizzParam}
                 options={translations[lang].home.typeOptions}
               />
             </Slide>
