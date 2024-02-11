@@ -32,12 +32,15 @@ export enum QuizzActionType {
   NEW_ANSWER = "newAnswer",
   RESTART = "restart",
   COUNT_DOWN = "countDown",
+  CHANGE_LANG = "changeLang",
 }
 
 export interface Action {
   type: QuizzActionType;
-  payload?: Question[] | string | boolean;
+  payload?: Question[] | string | boolean | Lang;
 }
+
+export type Lang = "es" | "en";
 
 export interface AppState {
   quizzState: QuizzState;
@@ -48,6 +51,7 @@ export interface AppState {
   finalUrl: string;
   secondsRemaining: number;
   circleDash: number;
+  lang: Lang;
 }
 
 export type Option = {
@@ -61,5 +65,3 @@ export type HomeKeys =
   | "difficultyOptions"
   | "typeLabel"
   | "typeOptions";
-
-export type Lang = "es" | "en";

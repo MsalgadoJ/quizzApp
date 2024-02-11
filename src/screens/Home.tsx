@@ -1,7 +1,7 @@
-import { useState, useEffect, ChangeEvent, Dispatch } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 import Select from "../components/Select";
-import { Action, InputType, Lang, QuizzState, Option } from "../types/types";
+import { InputType, Option, Lang, QuizzActionType } from "../types/types";
 import {
   BASE_URL,
   findCat,
@@ -11,16 +11,16 @@ import {
 } from "../helpers/helper";
 
 import { Slide } from "react-awesome-reveal";
-import ButtonStart from "../components/Button";
+import Button from "../components/Button";
 import InputNumber from "../components/InputNumber";
 import { testDataEn, testDataEs, translations } from "../helpers/translations";
+import { useQuizz } from "../contexts/QuizzContext";
+import LangButton from "../components/LangButton";
 
-interface IHomeProps {
-  dispatch: Dispatch<Action>;
-  quizzState: QuizzState;
-}
+export function Home() {
+  const { state, dispatch } = useQuizz();
 
-export function Home({ dispatch, quizzState }: IHomeProps) {
+  const { lang } = state;
   const [categories, setCategories] = useState<Option[]>([]);
   const [EScategories, setESCategories] = useState<Option[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Option>({
@@ -37,7 +37,6 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
   });
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);
   const [formError, setFormError] = useState(false);
-  const [lang, setLang] = useState<Lang>("en");
 
   useEffect(() => {
     setFormError(false);
@@ -75,9 +74,6 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        // const res = await fetch(`http://localhost:5000/categories/${lang}`);
-        // const data = await res.json();
-        // console.log(data);
         if (lang === "en") {
           setCategories([{ id: 0, name: "Any Category" }, ...testDataEn]);
         } else {
@@ -134,7 +130,7 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
       selectedDifficulty.id === 0 &&
       selectedType.id === 0
     ) {
-      setLang(lang);
+      dispatch({ type: QuizzActionType.CHANGE_LANG, payload: lang });
     } else {
       if (EScategories.length !== 0) {
         const translateCategory =
@@ -163,29 +159,40 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
         ...selectedType,
         name: translateType,
       });
-      setLang(lang);
+      dispatch({ type: QuizzActionType.CHANGE_LANG, payload: lang });
     }
   }
 
   return (
-    <div className="grid h-screen grid-rows-[auto_auto_1fr_auto] w-full animate-home">
-      <div>
-        <button onClick={() => handleLangChange("en")}>🇬🇧</button>
-        <button onClick={() => handleLangChange("es")}>🇪🇸</button>
+    <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto] w-full animate-home">
+      <div className="flex justify-end gap-2 pt-4 mr-4">
+        <LangButton
+          label={"🇬🇧"}
+          langProp="en"
+          handleLangChange={handleLangChange}
+        />
+        <LangButton
+          label={"🇪🇸"}
+          langProp="es"
+          handleLangChange={handleLangChange}
+        />
       </div>
       <div className="w-5/6 m-auto mt-10 flex flex-col items-center">
         <picture className="w-32 sm:w-36">
           <Slide direction="down">
-            <img src="quiz-logo.png" alt="" />
+            <img src="quiz-logo.png" alt="quizzMind-logo" />
           </Slide>
         </picture>
         <Slide direction="left">
-          <h1 className="text-2xl font-bold text-center mt-5 sm:text-3xl">
-            Welcome to <br /> QuizzyMind
-          </h1>
+          <h1
+            className="text-2xl font-bold text-center mt-5 sm:text-3xl"
+            dangerouslySetInnerHTML={{
+              __html: translations[lang].home.welcome,
+            }}
+          />
         </Slide>
         <p className="text-center mt-6 mb-5 animate-pulseOnce">
-          Select preferred options to start the game 😎
+          {translations[lang].home.instruction}
         </p>
       </div>
       <div className="overflow-y-auto overflow-x-hidden sm:max-w-1/2">
@@ -201,7 +208,7 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
               />
               <Select
                 name="category"
-                labelText="Choose your preferred category:"
+                labelText={`${translations[lang].home.categoryLabel}:`}
                 selectedValue={selectedCategory.name}
                 handleSelect={(e: ChangeEvent<HTMLInputElement>) =>
                   handleChange(e, InputType.CATEGORY)
@@ -230,14 +237,12 @@ export function Home({ dispatch, quizzState }: IHomeProps) {
           </div>
         </div>
       </div>
-      <ButtonStart
-        dispatch={dispatch}
+      <Button
         numberOfQuestions={numberOfQuestions}
         selectedCategory={selectedCategory}
         selectedDifficulty={selectedDifficulty}
         selectedType={selectedType}
         formError={formError}
-        quizzState={quizzState}
       />
     </div>
   );
