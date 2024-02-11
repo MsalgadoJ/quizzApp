@@ -79,7 +79,7 @@ export function getFinalUrl(
 }
 
 export function getClassString(quizzState: string) {
-  let base = "h-screen ";
+  let base = "min-h-screen ";
   if (quizzState === QuizzState.LOADING) {
     base +=
       "flex justify-center items-center bg-bg-quizz-sm bg-cover sm:bg-bg-quizz-lg sm:bg-cover xl:bg-bg-quizz-xl opacity-90";
@@ -95,34 +95,34 @@ export function getClassString(quizzState: string) {
   return base;
 }
 
-export function getFinalMessage(maxPoints: number, points: number) {
+export function getFinalMessage(maxPoints: number, points: number, lang: Lang) {
   switch (true) {
     case points < maxPoints / 3:
       return {
         img: "/girl.png",
         alt: "What was that?",
-        message: "What was that? 🤨",
+        message: translations[lang].finish.msg1,
         right: "98",
       };
     case points >= maxPoints / 3 && points < (2 / 3) * maxPoints:
       return {
         img: "/okay.png",
         alt: "ok",
-        message: "You can do better 😅",
+        message: translations[lang].finish.msg2,
         right: "114",
       };
     case points >= (2 / 3) * maxPoints && points < maxPoints:
       return {
         img: "/good-job.png",
         alt: "good job badge",
-        message: "That was great 😄",
+        message: translations[lang].finish.msg3,
         right: "101",
       };
     case points === maxPoints:
       return {
         img: "/clap.png",
         alt: "clap",
-        message: "You are a genius!! 🥳",
+        message: translations[lang].finish.msg4,
         right: "98",
       };
     default:

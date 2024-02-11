@@ -5,6 +5,7 @@ import {
   Question,
   QuizzActionType,
   QuizzState,
+  Lang,
 } from "../types/types";
 import { SECS_PER_QUESTION, pointsTable } from "../helpers/helper";
 
@@ -17,6 +18,7 @@ const initialState: AppState = {
   finalUrl: "",
   secondsRemaining: 0,
   circleDash: 283,
+  lang: "en",
 };
 
 type QuizzContextType = {
@@ -84,6 +86,12 @@ function reducer(state: AppState, action: Action) {
     case QuizzActionType.RESTART:
       return {
         ...initialState,
+      };
+    case QuizzActionType.CHANGE_LANG:
+      const lang = payload as Lang;
+      return {
+        ...state,
+        lang,
       };
     default:
       throw new Error("Action unknown");

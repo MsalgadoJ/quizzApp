@@ -1,29 +1,22 @@
-import { Action, Question, QuizzState } from "../types/types";
+import { Question } from "../types/types";
 import { pointsTable, getFinalMessage } from "../helpers/helper";
 import { Flip, Zoom } from "react-awesome-reveal";
-import { Dispatch } from "react";
-import ButtonStart from "../components/Button";
+import Button from "../components/Button";
+import { useQuizz } from "../contexts/QuizzContext";
+import { translations } from "../helpers/translations";
 
-export interface IFinishedProps {
-  points: number;
-  questions: Question[];
-  quizzState: QuizzState;
-  dispatch: Dispatch<Action>;
-}
+export default function Finished() {
+  const { state } = useQuizz();
 
-export default function Finished({
-  points,
-  questions,
-  dispatch,
-  quizzState,
-}: IFinishedProps) {
+  const { questions, points, lang } = state;
+
   const maxPoints = questions.reduce(
     (maxPoints: number, question: Question) =>
       maxPoints + pointsTable[question.difficulty],
     0
   );
 
-  const finalMessage = getFinalMessage(maxPoints, points);
+  const finalMessage = getFinalMessage(maxPoints, points, lang);
 
   return (
     <div className="max-w-[300px]">
@@ -34,7 +27,7 @@ export default function Finished({
           >
             <img src={finalMessage.img} alt={finalMessage.alt} />
           </picture>
-          <p className="mb-4">Your final score is:</p>
+          <p className="mb-4">{translations[lang].finish.score}</p>
           <Flip delay={600}>
             <div className="w-[100px] h-[100px] rounded-full border-2 border-orange-50 bg-violet-900 py-4 px-4 text-orange-50 flex justify-center items-center mb-4">
               <p className="text-4xl">{points}</p>
@@ -49,7 +42,7 @@ export default function Finished({
           </picture>
         </div>
       </Zoom>
-      <ButtonStart dispatch={dispatch} quizzState={quizzState} />
+      <Button />
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import { Fade } from "react-awesome-reveal";
-import { Action, QuizzActionType, QuizzState, Option } from "../types/types";
-import { Dispatch } from "react";
+import { QuizzActionType, QuizzState, Option } from "../types/types";
 import { getFinalUrl } from "../helpers/helper";
+import { useQuizz } from "../contexts/QuizzContext";
+import { translations } from "../helpers/translations";
 
 interface PropsButton {
-  dispatch: Dispatch<Action>;
   formError?: boolean;
-  quizzState: QuizzState;
   numberOfQuestions?: number;
   selectedCategory?: Option;
   selectedDifficulty?: Option;
@@ -14,14 +13,15 @@ interface PropsButton {
 }
 
 function Button({
-  quizzState,
-  dispatch,
   numberOfQuestions,
   selectedCategory,
   selectedDifficulty,
   selectedType,
   formError,
 }: PropsButton) {
+  const { state, dispatch } = useQuizz();
+  const { quizzState, lang } = state;
+
   const base = `w-full mb-4 uppercase inline-block rounded-full font-semibold tracking-wide px-4 py-2.5 hover:-translate-y-px active:translate-y-px`;
   return (
     <>
@@ -42,7 +42,7 @@ function Button({
               }}
               disabled={formError}
             >
-              get started
+              {translations[lang].home.startLabel}
             </button>
           </Fade>
         </div>
@@ -59,7 +59,7 @@ function Button({
               }
             }}
           >
-            try again
+            {translations[lang].finish.finishLabel}
           </button>
         </div>
       )}
