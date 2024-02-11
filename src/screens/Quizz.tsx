@@ -1,31 +1,24 @@
-import { Dispatch, useState } from "react";
+import { useState } from "react";
 import Options from "../components/Options";
-import { QuizzActionType, Question, Action } from "../types/types";
+import { QuizzActionType } from "../types/types";
 import { Zoom, Fade } from "react-awesome-reveal";
 
 import { decode } from "he";
 import Timer from "../components/Timer";
 import NextButton from "../components/NextButton";
+import { useQuizz } from "../contexts/QuizzContext";
 
-export interface IQuizzProps {
-  points: number;
-  currentIndex: number;
-  questions: Question[];
-  currentQuestion?: Question;
-  secondsRemaining: number;
-  circleDash: number;
-  dispatch: Dispatch<Action>;
-}
+export default function Quizz() {
+  const { state, dispatch } = useQuizz();
+  const {
+    points,
+    currentIndex,
+    questions,
+    currentQuestion,
+    secondsRemaining,
+    circleDash,
+  } = state;
 
-export default function Quizz({
-  points,
-  currentIndex,
-  questions,
-  currentQuestion,
-  secondsRemaining,
-  circleDash,
-  dispatch,
-}: IQuizzProps) {
   const [message, setMessage] = useState("Enter your answer 😄");
   const [hasAnswered, setHasAnswered] = useState(false);
   const [randomNumber, setRandomNumber] = useState(
