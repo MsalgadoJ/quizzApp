@@ -8,6 +8,7 @@ import {
   Lang,
 } from "../types/types";
 import { SECS_PER_QUESTION, pointsTable } from "../helpers/helper";
+import { fetchQuestions } from "../services/questionsService";
 
 const initialState: AppState = {
   quizzState: QuizzState.PENDING,
@@ -106,22 +107,21 @@ function QuizzProvider({ children }: { children: React.ReactNode }) {
   const { finalUrl, quizzState, questions } = state;
 
   useEffect(() => {
-    async function fetchQuestions() {
+    const fetchQuestionsAndDispatch = async () => {
       try {
-        const res = await fetch(finalUrl);
-        const data = await res.json();
+        const data = await fetchQuestions(finalUrl);
         dispatch({ type: QuizzActionType.FETCHED_DATA, payload: data.results });
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
       }
-    }
+    };
 
     if (
       quizzState === QuizzState.LOADING &&
       finalUrl !== "" &&
       questions.length === 0
     ) {
-      fetchQuestions();
+      fetchQuestionsAndDispatch();
     }
   }, [quizzState, questions]);
 

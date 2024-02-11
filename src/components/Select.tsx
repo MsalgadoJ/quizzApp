@@ -4,7 +4,10 @@ interface ISelectProps {
   name: string;
   labelText: string;
   selectedValue: string;
-  handleSelect: any;
+  handleSelect: (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    inputName: string
+  ) => void;
   options: Option[] | string[];
 }
 
@@ -37,7 +40,7 @@ const Select: React.FunctionComponent<ISelectProps> = ({
         name={name}
         id={name}
         value={selectedValue}
-        onChange={handleSelect}
+        onChange={(e) => handleSelect(e, name)}
       >
         {options &&
           options.map((option, i) => {

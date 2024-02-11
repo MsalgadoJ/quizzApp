@@ -10,14 +10,7 @@ import { useQuizz } from "../contexts/QuizzContext";
 
 export default function Quizz() {
   const { state, dispatch } = useQuizz();
-  const {
-    points,
-    currentIndex,
-    questions,
-    currentQuestion,
-    secondsRemaining,
-    circleDash,
-  } = state;
+  const { points, currentIndex, questions, currentQuestion } = state;
 
   const [message, setMessage] = useState("Enter your answer 😄");
   const [hasAnswered, setHasAnswered] = useState(false);
@@ -111,11 +104,7 @@ export default function Quizz() {
           />
         </Fade>
         <div className="mt-8 flex justify-between items-center">
-          <Timer
-            secondsRemaining={secondsRemaining}
-            dispatch={dispatch}
-            circleDash={circleDash}
-          />
+          <Timer />
           <NextButton hasAnswered={hasAnswered} handleNext={handleNext} />
         </div>
       </div>

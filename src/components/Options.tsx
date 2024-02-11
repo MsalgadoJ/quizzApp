@@ -21,9 +21,9 @@ const Options: React.FunctionComponent<ButtonProps> = ({
   incorrectAnswers,
   randomNumber,
 }) => {
-  return (
-    <div className="flex flex-col gap-4 min-h-[224px]">
-      {incorrectAnswers &&
+  function renderOptions() {
+    return (
+      (incorrectAnswers &&
         createOptions(
           incorrectAnswers,
           correctAnswer as string,
@@ -46,8 +46,13 @@ const Options: React.FunctionComponent<ButtonProps> = ({
               {decode(answer)}
             </button>
           );
-        })}
-    </div>
+        })) ||
+      []
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 min-h-[224px]">{renderOptions()}</div>
   );
 };
 
