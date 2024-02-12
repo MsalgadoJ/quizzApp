@@ -8,6 +8,7 @@ import LangButton from "../components/LangButton";
 import { useCategory } from "../hooks/useCategory";
 import { useQuizzParams } from "../hooks/useQuizzParams";
 import { useFormError } from "../hooks/useFormError";
+import GameMode from "../components/GameMode";
 
 export function Home() {
   const { state } = useQuizz();
@@ -31,7 +32,7 @@ export function Home() {
   );
 
   return (
-    <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto] w-full animate-home">
+    <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto_auto] w-full animate-home">
       <div className="flex justify-end gap-2 pt-4 mr-4">
         <LangButton
           label={"🇬🇧"}
@@ -98,6 +99,7 @@ export function Home() {
           </div>
         </div>
       </div>
+      <GameMode />
       <Button
         numberOfQuestions={numberOfQuestions}
         selectedCategory={selectedCategory}
