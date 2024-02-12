@@ -8,7 +8,8 @@ import LangButton from "../components/LangButton";
 import { useCategory } from "../hooks/useCategory";
 import { useQuizzParams } from "../hooks/useQuizzParams";
 import { useFormError } from "../hooks/useFormError";
-import GameMode from "../components/GameMode";
+import Checkbox from "../components/Checkbox";
+import InputName from "../components/InputName";
 
 export function Home() {
   const { state } = useQuizz();
@@ -23,6 +24,8 @@ export function Home() {
     selectedType,
     setQuizzParam,
     handleLangChange,
+    isChecked,
+    setIsChecked,
   } = useQuizzParams(categories, EScategories);
 
   const { formError } = useFormError(
@@ -73,6 +76,7 @@ export function Home() {
                 numberOfQuestions={numberOfQuestions}
                 handleChange={setQuizzParam}
                 lang={lang}
+                isChecked={isChecked}
               />
               <Select
                 name="category"
@@ -80,6 +84,7 @@ export function Home() {
                 selectedValue={selectedCategory.name}
                 handleSelect={setQuizzParam}
                 options={lang === "en" ? categories : EScategories}
+                isChecked={isChecked}
               />
               <Select
                 name="difficulty"
@@ -94,12 +99,16 @@ export function Home() {
                 selectedValue={selectedType.name}
                 handleSelect={setQuizzParam}
                 options={translations[lang].home.typeOptions}
+                isChecked={isChecked}
               />
             </Slide>
           </div>
         </div>
       </div>
-      <GameMode />
+      <div>
+        <InputName isChecked={isChecked} />
+        <Checkbox isChecked={isChecked} setIsChecked={setIsChecked} />
+      </div>
       <Button
         numberOfQuestions={numberOfQuestions}
         selectedCategory={selectedCategory}

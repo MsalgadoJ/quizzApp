@@ -23,11 +23,12 @@ export enum InputType {
   DIFFICULTY = "difficulty",
   TYPE = "type",
   NUMBER = "number",
+  NAME = "name",
 }
 
 export enum QuizzActionType {
   START = "start",
-  FETCHED_DATA = "fetchedData",
+  QUIZZ_STARTED = "quizzStarted",
   NEXT_QUESTION = "nextQuestion",
   NEW_ANSWER = "newAnswer",
   RESTART = "restart",

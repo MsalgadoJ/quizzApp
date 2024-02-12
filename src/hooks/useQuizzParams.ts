@@ -21,6 +21,8 @@ export function useQuizzParams(categories: Option[], EScategories: Option[]) {
     name: "Any Type",
   });
 
+  const [isChecked, setIsChecked] = useState(false);
+
   useEffect(() => {
     // this for updating the ui the first time we fetch spanish categories
     const categoryId = selectedCategory.id;
@@ -29,6 +31,14 @@ export function useQuizzParams(categories: Option[], EScategories: Option[]) {
       translateCategory && setSelectedCategory(translateCategory);
     }
   }, [EScategories]);
+
+  useEffect(() => {
+    if (isChecked) {
+      setNumberOfQuestions(10);
+      setSelectedCategory({ id: 9, name: "General Knowledge" });
+      setSelectedType({ id: 1, name: "Multiple Choice" });
+    }
+  }, [isChecked]);
 
   function setQuizzParam(
     e:
@@ -108,5 +118,7 @@ export function useQuizzParams(categories: Option[], EScategories: Option[]) {
     setSelectedCategory,
     setQuizzParam,
     handleLangChange,
+    isChecked,
+    setIsChecked,
   };
 }
