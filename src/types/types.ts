@@ -23,7 +23,7 @@ export enum InputType {
   DIFFICULTY = "difficulty",
   TYPE = "type",
   NUMBER = "number",
-  NAME = "name",
+  NAME = "text",
 }
 
 export enum QuizzActionType {
@@ -66,3 +66,38 @@ export type HomeKeys =
   | "difficultyOptions"
   | "typeLabel"
   | "typeOptions";
+
+export interface QuizzParamsState {
+  numberOfQuestions: number;
+  selectedCategory: Option;
+  selectedDifficulty: Option;
+  selectedType: Option;
+  username: string;
+  rankingModeIsChecked: boolean;
+}
+
+export enum QuizzParamsActionType {
+  SELECT_RANKING_MODE = "selectRankingMode",
+  TRANSLATE_PARAMS = "translateParams",
+  SET_PARAM = "setParam",
+}
+
+export type payloadTranslateType = {
+  langProp: Lang;
+  EScategories: Option[];
+  categories: Option[];
+};
+
+export type payloadChangeParamType = {
+  e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>;
+  inputName: InputType;
+  lang: Lang;
+  EScategories: Option[];
+  categories: Option[];
+};
+
+export interface QuizzParamsAction {
+  type: QuizzParamsActionType;
+  // payload?: Question[] | string | boolean | Lang;
+  payload?: payloadTranslateType | payloadChangeParamType;
+}

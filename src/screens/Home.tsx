@@ -9,7 +9,7 @@ import { useCategory } from "../hooks/useCategory";
 import { useQuizzParams } from "../hooks/useQuizzParams";
 import { useFormError } from "../hooks/useFormError";
 import Checkbox from "../components/Checkbox";
-import InputName from "../components/InputName";
+import { InputType } from "../types/types";
 
 export function Home() {
   const { state } = useQuizz();
@@ -24,8 +24,9 @@ export function Home() {
     selectedType,
     setQuizzParam,
     handleLangChange,
-    isChecked,
-    setIsChecked,
+    username,
+    rankingModeIsChecked,
+    dispatchAction,
   } = useQuizzParams(categories, EScategories);
 
   const { formError } = useFormError(
@@ -73,10 +74,11 @@ export function Home() {
               <InputNumber
                 labelText={translations[lang].home.inputLabel}
                 formError={formError}
-                numberOfQuestions={numberOfQuestions}
+                inputValue={numberOfQuestions}
                 handleChange={setQuizzParam}
                 lang={lang}
-                isChecked={isChecked}
+                rankingModeIsChecked={rankingModeIsChecked}
+                type={InputType.NUMBER}
               />
               <Select
                 name="category"
@@ -84,7 +86,7 @@ export function Home() {
                 selectedValue={selectedCategory.name}
                 handleSelect={setQuizzParam}
                 options={lang === "en" ? categories : EScategories}
-                isChecked={isChecked}
+                rankingModeIsChecked={rankingModeIsChecked}
               />
               <Select
                 name="difficulty"
@@ -99,15 +101,26 @@ export function Home() {
                 selectedValue={selectedType.name}
                 handleSelect={setQuizzParam}
                 options={translations[lang].home.typeOptions}
-                isChecked={isChecked}
+                rankingModeIsChecked={rankingModeIsChecked}
               />
             </Slide>
           </div>
         </div>
       </div>
-      <div>
-        <InputName isChecked={isChecked} />
-        <Checkbox isChecked={isChecked} setIsChecked={setIsChecked} />
+      <div className="w-5/6 mb-4 m-auto sm:max-w-[500px] flex flex-col justify-items-center items-center">
+        <InputNumber
+          labelText="Enter your name"
+          formError={formError}
+          inputValue={username}
+          handleChange={setQuizzParam}
+          lang={lang}
+          rankingModeIsChecked={rankingModeIsChecked}
+          type={InputType.NAME}
+        />
+        <Checkbox
+          rankingModeIsChecked={rankingModeIsChecked}
+          setIsChecked={setIsChecked}
+        />
       </div>
       <Button
         numberOfQuestions={numberOfQuestions}

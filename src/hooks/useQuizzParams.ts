@@ -1,73 +1,160 @@
-import { useEffect, useState } from "react";
-import { InputType, Lang, Option, QuizzActionType } from "../types/types";
+import { useEffect, useReducer } from "react";
+import {
+  InputType,
+  Lang,
+  Option,
+  QuizzActionType,
+  QuizzParamsAction,
+  QuizzParamsActionType,
+  QuizzParamsState,
+  payloadChangeParamType,
+  payloadTranslateType,
+} from "../types/types";
 import { findCat, getCatId, getIndex, getTranslation } from "../helpers/helper";
 import { useQuizz } from "../contexts/QuizzContext";
+
+const initialState: QuizzParamsState = {
+  numberOfQuestions: 1,
+  selectedCategory: {
+    id: 0,
+    name: "Any Category",
+  },
+  selectedDifficulty: {
+    id: 0,
+    name: "Any Difficulty",
+  },
+  selectedType: { id: 0, name: "Any Type" },
+  username: "",
+  rankingModeIsChecked: false,
+};
+
+function reducer(state: QuizzParamsState, action: QuizzParamsAction) {
+  const { type, payload } = action;
+  switch (type) {
+    case QuizzParamsActionType.SELECT_RANKING_MODE:
+      return {
+        ...state,
+        numberOfQuestions: 10,
+        selectedCategory: { id: 9, name: "General Knowledge" },
+        selectedType: { id: 1, name: "Multiple Choice" },
+      };
+    case QuizzParamsActionType.TRANSLATE_PARAMS:
+      const translatePayload = payload as payloadTranslateType;
+      const { langProp, EScategories, categories } = translatePayload;
+      // get translations before updating the state
+      const translateCategory =
+        langProp === "es" && EScategories?.length !== 0
+          ? findCat(EScategories, state.selectedCategory.id)
+          : findCat(categories, state.selectedCategory.id);
+      const translateDifficulty = getTranslation(
+        langProp,
+        "difficultyOptions",
+        state.selectedDifficulty.id
+      );
+      const translateType = getTranslation(
+        langProp,
+        "typeOptions",
+        state.selectedType.id
+      );
+      return {
+        ...state,
+        selectedCategory: translateCategory!,
+        selectedDifficulty: {
+          ...state.selectedDifficulty,
+          name: translateDifficulty,
+        },
+        selectedType: {
+          ...state.selectedType,
+          name: translateType,
+        },
+      };
+    case QuizzParamsActionType.SET_PARAM:
+      const { e, inputName, lang } = payload as payloadChangeParamType;
+      if (inputName === InputType.NUMBER) {
+        return {
+          ...state,
+          numberOfQuestions: parseFloat(e.target.value),
+        };
+      }
+      if (inputName === InputType.CATEGORY) {
+        const catId =
+          lang === "en"
+            ? getCatId(categories, e.target.value)
+            : getCatId(EScategories, e.target.value);
+        return {
+          ...state,
+          selectedCategory: { id: catId, name: e.target.value },
+        };
+      }
+      if (inputName === InputType.DIFFICULTY) {
+        const index = getIndex(e.target.value, "difficultyOptions", lang);
+        return {
+          ...state,
+          selectedDifficulty: { id: index, name: e.target.value },
+        };
+      }
+      if (inputName === InputType.TYPE) {
+        const index = getIndex(e.target.value, "typeOptions", lang);
+        return {
+          ...state,
+          selectedType: { id: index, name: e.target.value },
+        };
+      }
+      if (inputName === InputType.NAME) {
+        return {
+          ...state,
+          username: e.target.value,
+        };
+      }
+      return {
+        ...state,
+      };
+  }
+}
 
 export function useQuizzParams(categories: Option[], EScategories: Option[]) {
   const { state, dispatch } = useQuizz();
   const { lang } = state;
 
-  const [numberOfQuestions, setNumberOfQuestions] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState<Option>({
-    id: 0,
-    name: "Any Category",
-  });
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Option>({
-    id: 0,
-    name: "Any Difficulty",
-  });
-  const [selectedType, setSelectedType] = useState<Option>({
-    id: 0,
-    name: "Any Type",
-  });
+  const [
+    {
+      numberOfQuestions,
+      selectedCategory,
+      selectedDifficulty,
+      selectedType,
+      username,
+      rankingModeIsChecked,
+    },
+    dispatchAction,
+  ] = useReducer<
+    (state: QuizzParamsState, action: QuizzParamsAction) => QuizzParamsState
+  >(reducer, initialState);
 
-  const [isChecked, setIsChecked] = useState(false);
-
-  useEffect(() => {
-    // this for updating the ui the first time we fetch spanish categories
-    const categoryId = selectedCategory.id;
-    if (lang === "es" && categoryId !== 0) {
-      const translateCategory = findCat(EScategories, categoryId);
-      translateCategory && setSelectedCategory(translateCategory);
-    }
-  }, [EScategories]);
+  // useEffect(() => {
+  //   // this for updating the ui the first time we fetch spanish categories
+  //   const categoryId = selectedCategory.id;
+  //   if (lang === "es" && categoryId !== 0) {
+  //     const translateCategory = findCat(EScategories, categoryId);
+  //     translateCategory && setSelectedCategory(translateCategory);
+  //   }
+  // }, [EScategories]);
 
   useEffect(() => {
-    if (isChecked) {
-      setNumberOfQuestions(10);
-      setSelectedCategory({ id: 9, name: "General Knowledge" });
-      setSelectedType({ id: 1, name: "Multiple Choice" });
+    if (rankingModeIsChecked) {
+      dispatchAction({ type: QuizzParamsActionType.SELECT_RANKING_MODE });
     }
-  }, [isChecked]);
+  }, [rankingModeIsChecked]);
 
   function setQuizzParam(
     e:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>,
-    inputName: string
+    inputName: InputType
   ) {
-    switch (true) {
-      case inputName === InputType.NUMBER:
-        return setNumberOfQuestions(parseFloat(e.target.value));
-
-      case inputName === InputType.CATEGORY:
-        const catId =
-          lang === "en"
-            ? getCatId(categories, e.target.value)
-            : getCatId(EScategories, e.target.value);
-        return setSelectedCategory({ id: catId, name: e.target.value });
-
-      case inputName === InputType.DIFFICULTY:
-        const indexD = getIndex(e.target.value, "difficultyOptions", lang);
-        return setSelectedDifficulty({ id: indexD, name: e.target.value });
-
-      case inputName === InputType.TYPE:
-        const indexT = getIndex(e.target.value, "typeOptions", lang);
-        return setSelectedType({ id: indexT, name: e.target.value });
-
-      default:
-        throw new Error("type unknown");
-    }
+    dispatchAction({
+      type: QuizzParamsActionType.SET_PARAM,
+      payload: { e, inputName, lang, EScategories, categories },
+    });
   }
 
   function handleLangChange(langProp: Lang) {
@@ -78,33 +165,9 @@ export function useQuizzParams(categories: Option[], EScategories: Option[]) {
     ) {
       dispatch({ type: QuizzActionType.CHANGE_LANG, payload: langProp });
     } else {
-      if (EScategories.length !== 0) {
-        const translateCategory =
-          langProp === "es"
-            ? findCat(EScategories, selectedCategory.id)
-            : findCat(categories, selectedCategory.id);
-
-        translateCategory && setSelectedCategory(translateCategory);
-      }
-
-      const translateDifficulty = getTranslation(
-        langProp,
-        "difficultyOptions",
-        selectedDifficulty.id
-      );
-      setSelectedDifficulty({
-        ...selectedDifficulty,
-        name: translateDifficulty,
-      });
-
-      const translateType = getTranslation(
-        langProp,
-        "typeOptions",
-        selectedType.id
-      );
-      setSelectedType({
-        ...selectedType,
-        name: translateType,
+      dispatchAction({
+        type: QuizzParamsActionType.TRANSLATE_PARAMS,
+        payload: { langProp, EScategories, categories },
       });
       dispatch({ type: QuizzActionType.CHANGE_LANG, payload: langProp });
     }
@@ -115,10 +178,10 @@ export function useQuizzParams(categories: Option[], EScategories: Option[]) {
     selectedCategory,
     selectedDifficulty,
     selectedType,
-    setSelectedCategory,
+    username,
     setQuizzParam,
     handleLangChange,
-    isChecked,
-    setIsChecked,
+    rankingModeIsChecked,
+    dispatchAction,
   };
 }
