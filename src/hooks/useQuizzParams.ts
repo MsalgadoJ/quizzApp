@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from "react";
 import {
   InputType,
   Lang,
@@ -9,22 +9,22 @@ import {
   QuizzParamsState,
   payloadChangeParamType,
   payloadTranslateType,
-} from '../types/types';
-import { findCat, getCatId, getIndex, getTranslation } from '../helpers/helper';
-import { useQuizz } from '../contexts/QuizzContext';
+} from "../types/types";
+import { findCat, getCatId, getIndex, getTranslation } from "../helpers/helper";
+import { useQuizz } from "../contexts/QuizzContext";
 
 const initialState: QuizzParamsState = {
   numberOfQuestions: 1,
   selectedCategory: {
     id: 0,
-    name: 'Any Category',
+    name: "Any Category",
   },
   selectedDifficulty: {
     id: 0,
-    name: 'Any Difficulty',
+    name: "Any Difficulty",
   },
-  selectedType: { id: 0, name: 'Any Type' },
-  username: '',
+  selectedType: { id: 0, name: "Any Type" },
+  username: "",
   rankingModeIsChecked: false,
 };
 
@@ -40,26 +40,26 @@ function reducer(state: QuizzParamsState, action: QuizzParamsAction) {
       return {
         ...state,
         numberOfQuestions: 10,
-        selectedCategory: { id: 9, name: 'General Knowledge' },
-        selectedType: { id: 1, name: 'Multiple Choice' },
+        selectedCategory: { id: 9, name: "General Knowledge" },
+        selectedType: { id: 1, name: "Multiple Choice" },
       };
     case QuizzParamsActionType.TRANSLATE_PARAMS:
       const translatePayload = payload as payloadTranslateType;
       const { langProp, EScategories, categories } = translatePayload;
       // get translations before updating the state
       const translateCategory =
-        langProp === 'es' && EScategories?.length !== 0
+        langProp === "es" && EScategories?.length !== 0
           ? findCat(EScategories, state.selectedCategory.id)
           : findCat(categories, state.selectedCategory.id);
       const translateDifficulty = getTranslation(
         langProp,
-        'difficultyOptions',
-        state.selectedDifficulty.id,
+        "difficultyOptions",
+        state.selectedDifficulty.id
       );
       const translateType = getTranslation(
         langProp,
-        'typeOptions',
-        state.selectedType.id,
+        "typeOptions",
+        state.selectedType.id
       );
       return {
         ...state,
@@ -83,7 +83,7 @@ function reducer(state: QuizzParamsState, action: QuizzParamsAction) {
       }
       if (inputName === InputType.CATEGORY) {
         const catId =
-          lang === 'en'
+          lang === "en"
             ? getCatId(categories, e.target.value)
             : getCatId(EScategories, e.target.value);
         return {
@@ -92,14 +92,14 @@ function reducer(state: QuizzParamsState, action: QuizzParamsAction) {
         };
       }
       if (inputName === InputType.DIFFICULTY) {
-        const index = getIndex(e.target.value, 'difficultyOptions', lang);
+        const index = getIndex(e.target.value, "difficultyOptions", lang);
         return {
           ...state,
           selectedDifficulty: { id: index, name: e.target.value },
         };
       }
       if (inputName === InputType.TYPE) {
-        const index = getIndex(e.target.value, 'typeOptions', lang);
+        const index = getIndex(e.target.value, "typeOptions", lang);
         return {
           ...state,
           selectedType: { id: index, name: e.target.value },
@@ -154,7 +154,7 @@ export function useQuizzParams(categories: Option[], EScategories: Option[]) {
     e:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>,
-    inputName: InputType,
+    inputName: InputType
   ) {
     dispatchAction({
       type: QuizzParamsActionType.SET_PARAM,

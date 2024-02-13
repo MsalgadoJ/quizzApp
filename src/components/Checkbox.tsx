@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { QuizzParamsActionType } from "../types/types";
 
-interface IAppProps {}
+interface IAppProps {
+  rankingModeIsChecked: boolean;
+  dispatchAction: any;
+}
 
 const Checkbox: React.FunctionComponent<IAppProps> = ({
   rankingModeIsChecked,
+  dispatchAction,
 }) => {
   return (
     <div>
@@ -11,7 +15,9 @@ const Checkbox: React.FunctionComponent<IAppProps> = ({
         id="rakingMode"
         type="checkbox"
         checked={rankingModeIsChecked}
-        onChange={() => setIsChecked(!isChecked)}
+        onChange={() =>
+          dispatchAction({ type: QuizzParamsActionType.TOGGLE_RANKING_MODE })
+        }
       />
       <label htmlFor="rakingMode">
         {" "}

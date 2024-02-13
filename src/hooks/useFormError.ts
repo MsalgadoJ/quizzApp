@@ -5,18 +5,20 @@ import { translations } from "../helpers/translations";
 export function useFormError(
   numberOfQuestions: number,
   categoryId: number,
-  difficultyId: number
+  difficultyId: number,
+  username: string
 ) {
-  const [formError, setFormError] = useState(false);
-  console.log();
+  const [numberError, setNumberError] = useState(false);
+  const [nameError, setNameError] = useState({ count: 0, isError: false });
   useEffect(() => {
     console.log("vengo a ver si hay errores");
-    setFormError(false);
+    setNumberError(false);
 
     const fetchData = async () => {
-      if (Number.isNaN(numberOfQuestions) || numberOfQuestions === 0) {
+      console.log("numberOfQuestions", numberOfQuestions);
+      if (isNaN(numberOfQuestions) || numberOfQuestions === 0) {
         console.log("error 1");
-        setFormError(true);
+        setNumberError(true);
       }
       if (categoryId !== 0) {
         const data = await fetchCategoryCount(categoryId);
@@ -25,21 +27,31 @@ export function useFormError(
           numberOfQuestions >
             data.category_question_count[
               `total_${translations.en.home.difficultyOptions[difficultyId].toLocaleLowerCase()}_question_count`
-            ] && setFormError(true);
+            ] && setNumberError(true);
         } else if (categoryId !== 0) {
           console.log("error 2");
           numberOfQuestions >
             data.category_question_count.total_question_count &&
-            setFormError(true);
+            setNumberError(true);
         }
       } else {
         const data = await fetchTotalCount();
-        numberOfQuestions > data && setFormError(true);
+        numberOfQuestions > data && setNumberError(true);
         console.log(data);
       }
     };
     fetchData();
   }, [categoryId, numberOfQuestions, difficultyId]);
 
-  return { formError };
+  useEffect(() => {
+    console.log("nameError", nameError);
+    setNameError({ count: 0, isError: false });
+    // console.log("error name =====>");
+    // if (!username && nameError.count > 0) {
+    //   console.log("lo hacemos true");
+    //   setNameError(true);
+    // }
+  }, [username]);
+
+  return { numberError, nameError, setNameError };
 }

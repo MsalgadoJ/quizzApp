@@ -1,15 +1,15 @@
-import Select from '../components/Select';
-import { Slide } from 'react-awesome-reveal';
-import Button from '../components/Button';
-import InputNumber from '../components/InputNumber';
-import { translations } from '../helpers/translations';
-import { useQuizz } from '../contexts/QuizzContext';
-import LangButton from '../components/LangButton';
-import { useCategory } from '../hooks/useCategory';
-import { useQuizzParams } from '../hooks/useQuizzParams';
-import { useFormError } from '../hooks/useFormError';
-import Checkbox from '../components/Checkbox';
-import { InputType } from '../types/types';
+import Select from "../components/Select";
+import { Slide } from "react-awesome-reveal";
+import Button from "../components/Button";
+import InputNumber from "../components/InputNumber";
+import { translations } from "../helpers/translations";
+import { useQuizz } from "../contexts/QuizzContext";
+import LangButton from "../components/LangButton";
+import { useCategory } from "../hooks/useCategory";
+import { useQuizzParams } from "../hooks/useQuizzParams";
+import { useFormError } from "../hooks/useFormError";
+import Checkbox from "../components/Checkbox";
+import { InputType } from "../types/types";
 
 export function Home() {
   const { state } = useQuizz();
@@ -29,22 +29,23 @@ export function Home() {
     dispatchAction,
   } = useQuizzParams(categories, EScategories);
 
-  const { formError } = useFormError(
+  const { numberError, nameError, setNameError } = useFormError(
     numberOfQuestions,
     selectedCategory.id,
     selectedDifficulty.id,
+    username
   );
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto_auto] w-full animate-home">
       <div className="flex justify-end gap-2 pt-4 mr-4">
         <LangButton
-          label={'🇬🇧'}
+          label={"🇬🇧"}
           langProp="en"
           handleLangChange={handleLangChange}
         />
         <LangButton
-          label={'🇪🇸'}
+          label={"🇪🇸"}
           langProp="es"
           handleLangChange={handleLangChange}
         />
@@ -73,7 +74,8 @@ export function Home() {
             <Slide direction="right">
               <InputNumber
                 labelText={translations[lang].home.inputLabel}
-                formError={formError}
+                numberError={numberError}
+                nameError={nameError}
                 inputValue={numberOfQuestions}
                 handleChange={setQuizzParam}
                 lang={lang}
@@ -81,22 +83,22 @@ export function Home() {
                 type={InputType.NUMBER}
               />
               <Select
-                name="category"
+                name={InputType.CATEGORY}
                 labelText={`${translations[lang].home.categoryLabel}:`}
                 selectedValue={selectedCategory.name}
                 handleSelect={setQuizzParam}
-                options={lang === 'en' ? categories : EScategories}
+                options={lang === "en" ? categories : EScategories}
                 rankingModeIsChecked={rankingModeIsChecked}
               />
               <Select
-                name="difficulty"
+                name={InputType.DIFFICULTY}
                 labelText={`${translations[lang].home.difficultyLabel}:`}
                 selectedValue={selectedDifficulty.name}
                 handleSelect={setQuizzParam}
                 options={translations[lang].home.difficultyOptions}
               />
               <Select
-                name="type"
+                name={InputType.TYPE}
                 labelText={`${translations[lang].home.typeLabel}:`}
                 selectedValue={selectedType.name}
                 handleSelect={setQuizzParam}
@@ -110,7 +112,8 @@ export function Home() {
       <div className="w-5/6 mb-4 m-auto sm:max-w-[500px] flex flex-col justify-items-center items-center">
         <InputNumber
           labelText="Enter your name"
-          formError={formError}
+          numberError={numberError}
+          nameError={nameError}
           inputValue={username}
           handleChange={setQuizzParam}
           lang={lang}
@@ -127,7 +130,10 @@ export function Home() {
         selectedCategory={selectedCategory}
         selectedDifficulty={selectedDifficulty}
         selectedType={selectedType}
-        formError={formError}
+        numberError={numberError}
+        username={username}
+        setNameError={setNameError}
+        nameError={nameError}
       />
     </div>
   );
