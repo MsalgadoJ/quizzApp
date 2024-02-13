@@ -3,15 +3,14 @@ import { useState } from "react";
 interface IAppProps {}
 
 const Checkbox: React.FunctionComponent<IAppProps> = ({
-  isChecked,
-  setIsChecked,
+  rankingModeIsChecked,
 }) => {
   return (
     <div>
       <input
         id="rakingMode"
         type="checkbox"
-        checked={isChecked}
+        checked={rankingModeIsChecked}
         onChange={() => setIsChecked(!isChecked)}
       />
       <label htmlFor="rakingMode">
