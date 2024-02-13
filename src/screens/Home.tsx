@@ -1,15 +1,15 @@
-import Select from "../components/Select";
-import { Slide } from "react-awesome-reveal";
-import Button from "../components/Button";
-import InputNumber from "../components/InputNumber";
-import { translations } from "../helpers/translations";
-import { useQuizz } from "../contexts/QuizzContext";
-import LangButton from "../components/LangButton";
-import { useCategory } from "../hooks/useCategory";
-import { useQuizzParams } from "../hooks/useQuizzParams";
-import { useFormError } from "../hooks/useFormError";
-import Checkbox from "../components/Checkbox";
-import { InputType } from "../types/types";
+import Select from '../components/Select';
+import { Slide } from 'react-awesome-reveal';
+import Button from '../components/Button';
+import InputNumber from '../components/InputNumber';
+import { translations } from '../helpers/translations';
+import { useQuizz } from '../contexts/QuizzContext';
+import LangButton from '../components/LangButton';
+import { useCategory } from '../hooks/useCategory';
+import { useQuizzParams } from '../hooks/useQuizzParams';
+import { useFormError } from '../hooks/useFormError';
+import Checkbox from '../components/Checkbox';
+import { InputType } from '../types/types';
 
 export function Home() {
   const { state } = useQuizz();
@@ -32,19 +32,19 @@ export function Home() {
   const { formError } = useFormError(
     numberOfQuestions,
     selectedCategory.id,
-    selectedDifficulty.id
+    selectedDifficulty.id,
   );
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto_auto] w-full animate-home">
       <div className="flex justify-end gap-2 pt-4 mr-4">
         <LangButton
-          label={"🇬🇧"}
+          label={'🇬🇧'}
           langProp="en"
           handleLangChange={handleLangChange}
         />
         <LangButton
-          label={"🇪🇸"}
+          label={'🇪🇸'}
           langProp="es"
           handleLangChange={handleLangChange}
         />
@@ -85,7 +85,7 @@ export function Home() {
                 labelText={`${translations[lang].home.categoryLabel}:`}
                 selectedValue={selectedCategory.name}
                 handleSelect={setQuizzParam}
-                options={lang === "en" ? categories : EScategories}
+                options={lang === 'en' ? categories : EScategories}
                 rankingModeIsChecked={rankingModeIsChecked}
               />
               <Select
@@ -119,7 +119,7 @@ export function Home() {
         />
         <Checkbox
           rankingModeIsChecked={rankingModeIsChecked}
-          setIsChecked={setIsChecked}
+          dispatchAction={dispatchAction}
         />
       </div>
       <Button
