@@ -11,6 +11,7 @@ export const translations = {
       typeOptions: ["Any Type", "Multiple Choice", "True/False"],
       formError1: "Please select fewer questions for this category",
       formError2: "You must type a number",
+      nameError: "You must type your name",
       startLabel: "get started",
     },
     finish: {
@@ -34,6 +35,7 @@ export const translations = {
       typeOptions: ["Cualquier tipo", "Selección múltiple", "Verdadero/Falso"],
       formError1: "Por favor, selecciona menos preguntas para esta categoría",
       formError2: "Debes tipear un número",
+      nameError: "Debes colocar tu nombre",
       startLabel: "comenzar",
     },
     finish: {

@@ -42,7 +42,7 @@ function reducer(state: AppState, action: Action) {
         quizzState: QuizzState.LOADING,
         finalUrl: url,
       };
-    case QuizzActionType.FETCHED_DATA:
+    case QuizzActionType.QUIZZ_STARTED:
       const questions = payload as Question[];
       return {
         ...state,
@@ -110,7 +110,10 @@ function QuizzProvider({ children }: { children: React.ReactNode }) {
     const fetchQuestionsAndDispatch = async () => {
       try {
         const data = await fetchQuestions(finalUrl);
-        dispatch({ type: QuizzActionType.FETCHED_DATA, payload: data.results });
+        dispatch({
+          type: QuizzActionType.QUIZZ_STARTED,
+          payload: data.results,
+        });
       } catch (error) {
         console.error(error);
       }

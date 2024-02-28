@@ -8,6 +8,8 @@ import LangButton from "../components/LangButton";
 import { useCategory } from "../hooks/useCategory";
 import { useQuizzParams } from "../hooks/useQuizzParams";
 import { useFormError } from "../hooks/useFormError";
+import Checkbox from "../components/Checkbox";
+import { InputType } from "../types/types";
 
 export function Home() {
   const { state } = useQuizz();
@@ -22,16 +24,20 @@ export function Home() {
     selectedType,
     setQuizzParam,
     handleLangChange,
+    username,
+    rankingModeIsChecked,
+    dispatchAction,
   } = useQuizzParams(categories, EScategories);
 
-  const { formError } = useFormError(
+  const { numberError, nameError, setNameError } = useFormError(
     numberOfQuestions,
     selectedCategory.id,
-    selectedDifficulty.id
+    selectedDifficulty.id,
+    username
   );
 
   return (
-    <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto] w-full animate-home">
+    <div className="grid min-h-screen grid-rows-[auto_auto_1fr_auto_auto] w-full animate-home">
       <div className="flex justify-end gap-2 pt-4 mr-4">
         <LangButton
           label={"🇬🇧"}
@@ -68,42 +74,66 @@ export function Home() {
             <Slide direction="right">
               <InputNumber
                 labelText={translations[lang].home.inputLabel}
-                formError={formError}
-                numberOfQuestions={numberOfQuestions}
+                numberError={numberError}
+                nameError={nameError}
+                inputValue={numberOfQuestions}
                 handleChange={setQuizzParam}
                 lang={lang}
+                rankingModeIsChecked={rankingModeIsChecked}
+                type={InputType.NUMBER}
               />
               <Select
-                name="category"
+                name={InputType.CATEGORY}
                 labelText={`${translations[lang].home.categoryLabel}:`}
                 selectedValue={selectedCategory.name}
                 handleSelect={setQuizzParam}
                 options={lang === "en" ? categories : EScategories}
+                rankingModeIsChecked={rankingModeIsChecked}
               />
               <Select
-                name="difficulty"
+                name={InputType.DIFFICULTY}
                 labelText={`${translations[lang].home.difficultyLabel}:`}
                 selectedValue={selectedDifficulty.name}
                 handleSelect={setQuizzParam}
                 options={translations[lang].home.difficultyOptions}
               />
               <Select
-                name="type"
+                name={InputType.TYPE}
                 labelText={`${translations[lang].home.typeLabel}:`}
                 selectedValue={selectedType.name}
                 handleSelect={setQuizzParam}
                 options={translations[lang].home.typeOptions}
+                rankingModeIsChecked={rankingModeIsChecked}
               />
             </Slide>
           </div>
         </div>
+      </div>
+      <div className="w-5/6 mb-4 m-auto sm:max-w-[500px] flex flex-col justify-items-center items-center">
+        <InputNumber
+          labelText="Enter your name"
+          numberError={numberError}
+          nameError={nameError}
+          inputValue={username}
+          handleChange={setQuizzParam}
+          lang={lang}
+          rankingModeIsChecked={rankingModeIsChecked}
+          type={InputType.NAME}
+        />
+        <Checkbox
+          rankingModeIsChecked={rankingModeIsChecked}
+          dispatchAction={dispatchAction}
+        />
       </div>
       <Button
         numberOfQuestions={numberOfQuestions}
         selectedCategory={selectedCategory}
         selectedDifficulty={selectedDifficulty}
         selectedType={selectedType}
-        formError={formError}
+        numberError={numberError}
+        username={username}
+        setNameError={setNameError}
+        nameError={nameError}
       />
     </div>
   );

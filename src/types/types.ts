@@ -12,27 +12,28 @@ export interface Question {
 }
 
 export enum QuizzState {
-  PENDING = "pending",
-  LOADING = "loading",
-  STARTED = "started",
-  FINISHED = "finished",
+  PENDING = 'pending',
+  LOADING = 'loading',
+  STARTED = 'started',
+  FINISHED = 'finished',
 }
 
 export enum InputType {
-  CATEGORY = "category",
-  DIFFICULTY = "difficulty",
-  TYPE = "type",
-  NUMBER = "number",
+  CATEGORY = 'category',
+  DIFFICULTY = 'difficulty',
+  TYPE = 'type',
+  NUMBER = 'number',
+  NAME = 'text',
 }
 
 export enum QuizzActionType {
-  START = "start",
-  FETCHED_DATA = "fetchedData",
-  NEXT_QUESTION = "nextQuestion",
-  NEW_ANSWER = "newAnswer",
-  RESTART = "restart",
-  COUNT_DOWN = "countDown",
-  CHANGE_LANG = "changeLang",
+  START = 'start',
+  QUIZZ_STARTED = 'quizzStarted',
+  NEXT_QUESTION = 'nextQuestion',
+  NEW_ANSWER = 'newAnswer',
+  RESTART = 'restart',
+  COUNT_DOWN = 'countDown',
+  CHANGE_LANG = 'changeLang',
 }
 
 export interface Action {
@@ -40,7 +41,7 @@ export interface Action {
   payload?: Question[] | string | boolean | Lang;
 }
 
-export type Lang = "es" | "en";
+export type Lang = 'es' | 'en';
 
 export interface AppState {
   quizzState: QuizzState;
@@ -60,8 +61,44 @@ export type Option = {
 };
 
 export type HomeKeys =
-  | "inputLabel"
-  | "difficultyLabel"
-  | "difficultyOptions"
-  | "typeLabel"
-  | "typeOptions";
+  | 'inputLabel'
+  | 'difficultyLabel'
+  | 'difficultyOptions'
+  | 'typeLabel'
+  | 'typeOptions';
+
+export interface QuizzParamsState {
+  numberOfQuestions: number;
+  selectedCategory: Option;
+  selectedDifficulty: Option;
+  selectedType: Option;
+  username: string;
+  rankingModeIsChecked: boolean;
+}
+
+export enum QuizzParamsActionType {
+  TOGGLE_RANKING_MODE = 'toggleRankinMode',
+  SELECT_RANKING_MODE = 'selectRankingMode',
+  TRANSLATE_PARAMS = 'translateParams',
+  SET_PARAM = 'setParam',
+}
+
+export type payloadTranslateType = {
+  langProp: Lang;
+  EScategories: Option[];
+  categories: Option[];
+};
+
+export type payloadChangeParamType = {
+  e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>;
+  inputName: InputType;
+  lang: Lang;
+  EScategories: Option[];
+  categories: Option[];
+};
+
+export interface QuizzParamsAction {
+  type: QuizzParamsActionType;
+  // payload?: Question[] | string | boolean | Lang;
+  payload?: payloadTranslateType | payloadChangeParamType;
+}
